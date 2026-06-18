@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Preview para WhatsApp -->
+    <meta property="og:title" content="Tengo algo para ti... 🧿">
+    <meta property="og:description" content="Abre tu regalo cuando tengas un momento tranquilo. ¡Paciencia!">
+    <meta property="og:type" content="website">
+    <title>Para Grachi 🧿</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #0d2240;
+            --bg-gradient: radial-gradient(circle at top center, #1b3d6d 0%, #08162b 100%);
+            --card-bg: #ffffff;
+            --paper-bg: #fffcf8;
+            --accent-gold: #d4af37;
+            --accent-gold-deep: #b8923a;
+            --text-main: #f9f9f9;
+            --text-dark: #1a2a3a;
+            --nazar-dark: #0f2b5a;
+            --nazar-light: #4cb1f7;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: var(--bg-color);
+            background-image: var(--bg-gradient);
+            background-attachment: fixed;
+            font-family: 'Montserrat', sans-serif;
+            color: var(--text-main);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+        }
+
+        /* --- Pantalla principal --- */
+        .dashboard {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 44px 22px 60px;
+        }
+
+        .header { text-align: center; margin-bottom: 42px; }
+
+        .header-nazar {
+            width: 56px; height: 56px;
+            display: inline-block;
+            border-radius: 50%;
+            margin-bottom: 20px;
+            animation: pulse 3s infinite alternate;
+        }
+
+        .subtitle {
+            display: block;
+            font-size: 0.7rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--accent-gold);
+            font-weight: 500;
+            margin-bottom: 12px;
+        }
+
+        h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.75rem;
+            font-weight: 400;
+            line-height: 1.04;
+        }
+
+        .divider {
+            width: 40px; height: 1px;
+            background: var(--accent-gold);
+            margin: 20px auto;
+        }
+
+        .description {
+            font-size: 0.82rem;
+            font-weight: 300;
+            line-height: 1.7;
+            color: rgba(255, 255, 255, 0.7);
+            max-width: 290px;
+            margin: 0 auto;
+        }
+
+        /* Grid de sobres */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: none;
+            border-radius: 4px;
+            padding: 30px 15px 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            font-family: inherit;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            transition: transform 0.3s cubic-bezier(.22,1,.36,1), box-shadow 0.3s ease;
+        }
+        .card:hover { transform: translateY(-3px); box-shadow: 0 16px 30px rgba(0,0,0,0.32); }
+        .card:active { transform: scale(0.96); }
+
+        .nazar-seal {
+            width: 45px; height: 45px;
+            display: block;
+            border-radius: 50%;
+            margin-bottom: 18px;
+            animation: pulse 3s infinite alternate;
+        }
+        .nazar-svg { width: 100%; height: 100%; display: block; }
+
+        @keyframes pulse {
+            0%   { transform: scale(1);    box-shadow: 0 0 0 0 rgba(76,177,247,0.45); }
+            70%  { transform: scale(1.06); box-shadow: 0 0 0 11px rgba(76,177,247,0); }
+            100% { transform: scale(1);    box-shadow: 0 0 0 0 rgba(76,177,247,0); }
+        }
+
+        .card-label {
+            font-size: 0.6rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--accent-gold-deep);
+            font-weight: 600;
+            margin-bottom: 7px;
+        }
+
+        .card-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            line-height: 1.2;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+        }
+
+        .footer-text {
+            text-align: center;
+            margin-top: 50px;
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            font-size: 1.05rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* --- Overlay / modales --- */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(8, 22, 43, 0.9);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: flex-start;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            padding: 28px 20px 40px;
+            overflow-y: auto;
+        }
+        .overlay.active { display: flex; opacity: 1; }
+        .overlay.center { align-items: center; }
+
+        /* Modal de bloqueo */
+        .locked-modal {
+            background: var(--card-bg);
+            padding: 40px 30px;
+            border-radius: 8px;
+            text-align: center;
+            max-width: 320px;
+            width: 100%;
+            color: var(--text-dark);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            border-bottom: 4px solid var(--accent-gold);
+            animation: pop 0.4s cubic-bezier(.22,1,.36,1) both;
+        }
+        .locked-modal h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--nazar-dark);
+        }
+        .locked-modal p {
+            font-size: 0.88rem;
+            font-weight: 300;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            color: #555;
+        }
+
+        .btn {
+            background: var(--nazar-dark);
+            color: #fff;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 25px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.82rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .btn:hover { background: var(--accent-gold); }
+
+        /* Vista de carta */
+        .letter-view {
+            background: var(--paper-bg);
+            width: 100%;
+            max-width: 400px;
+            border-radius: 4px;
+            padding: 50px 30px;
+            color: var(--text-dark);
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            animation: letterIn 0.6s cubic-bezier(.22,1,.36,1) both;
+        }
+        .letter-view::before {
+            content: '';
+            position: absolute;
+            inset: 20px;
+            border: 1px solid rgba(212, 175, 55, 0.35);
+            pointer-events: none;
+        }
+        .letter-header { text-align: center; margin-bottom: 30px; }
+        .letter-header .nazar-seal { width: 46px; height: 46px; margin: 0 auto; animation: none; }
+        .letter-header h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--nazar-dark);
+            margin-top: 15px;
+            line-height: 1.16;
+        }
+        .letter-body {
+            font-size: 0.95rem;
+            font-weight: 300;
+            line-height: 1.85;
+            color: #333;
+            margin-bottom: 40px;
+            white-space: pre-wrap;
+        }
+        .close-letter-btn {
+            display: block;
+            margin: 0 auto;
+            background: none;
+            border: 1px solid var(--nazar-dark);
+            color: var(--nazar-dark);
+            padding: 11px 24px;
+            border-radius: 20px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.78rem;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .close-letter-btn:hover { background: var(--nazar-dark); color: #fff; }
+
+        @keyframes pop { from { transform: translateY(14px) scale(.96); } to { transform: translateY(0) scale(1); } }
+        @keyframes letterIn { from { transform: translateY(26px); } to { transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <!-- Pantalla principal -->
+    <div class="dashboard" id="dashboard">
+        <div class="header">
+            <span class="header-nazar">
+                <svg class="nazar-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="48" fill="#0f2b5a"/>
+                    <circle cx="50" cy="50" r="35" fill="#ffffff"/>
+                    <circle cx="50" cy="50" r="22" fill="#4cb1f7"/>
+                    <circle cx="50" cy="50" r="10" fill="#0a1120"/>
+                </svg>
+            </span>
+            <span class="subtitle">Una colección para ti</span>
+            <h1>Para Grachi</h1>
+            <div class="divider"></div>
+            <p class="description">Pequeñas cartas y un nazar que te cuida. Ábrelas solo cuando sea el día indicado y deja que el ojo turco te proteja desde lejos.</p>
+        </div>
+
+        <div class="cards-grid">
+            <!-- Los sobres se generan por JS -->
+        </div>
+
+        <div class="footer-text">con cariño, Jotace</div>
+    </div>
+
+    <!-- Capa oscura (modales) -->
+    <div class="overlay" id="overlay">
+
+        <!-- Modal: aún no puedes abrirlo -->
+        <div class="locked-modal" id="locked-modal" style="display: none;">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#d4af37" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 15px;">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <h2>Aún no está sellado...</h2>
+            <p>Para que la magia funcione, solo puedes abrir la carta que <strong>Jotace</strong> te indique cada día.<br><br>¡Paciencia, mi amor! 🧿✨</p>
+            <button class="btn" onclick="closeModal()">Entendido</button>
+        </div>
+
+        <!-- Modal: la carta real -->
+        <div class="letter-view" id="letter-view" style="display: none;">
+            <div class="letter-header">
+                <span class="nazar-seal">
+                    <svg class="nazar-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="48" fill="#0f2b5a"/>
+                        <circle cx="50" cy="50" r="35" fill="#ffffff"/>
+                        <circle cx="50" cy="50" r="22" fill="#4cb1f7"/>
+                        <circle cx="50" cy="50" r="10" fill="#0a1120"/>
+                    </svg>
+                </span>
+                <h2 id="letter-title">Título</h2>
+            </div>
+            <div class="letter-body" id="letter-content">Contenido de la carta...</div>
+            <button class="close-letter-btn" onclick="closeModal()">Guardar en mi corazón</button>
+        </div>
+
+    </div>
+
+    <script>
+        // ╭──────────────────────────────────────────────────────────╮
+        // │  CONFIGURACIÓN — cambia false→true para habilitar cartas  │
+        // ╰──────────────────────────────────────────────────────────╯
+        const unlockedLetters = [
+            false, // 0: me extrañes
+            false, // 1: tengas un mal día
+            false, // 2: no puedas dormir
+            false  // 3: necesites una sonrisa
+        ];
+
+        // Contenido de las cartas
+        const lettersData = [
+            {
+                label: "Ábrelo cuando",
+                title: "me extrañes",
+                content: "Mi amor,\n\nSé que la distancia a veces pesa mucho y los días sin vernos se sienten eternos.\n\nPero quiero que sepas que aunque no pueda abrazarte físicamente ahora mismo, estás en cada uno de mis pensamientos. Cierra los ojos un segundo, respira profundo e imagíname ahí contigo.\n\nFalta un día menos para volver a vernos.\n\nTe amo muchísimo."
+            },
+            {
+                label: "Ábrelo cuando",
+                title: "tengas un mal día",
+                content: "¡Hey, mi niña hermosa!\n\nRespira. Sé que hoy las cosas no salieron como querías y que todo parece gris.\n\nRecuerda lo fuerte y capaz que eres. Este mal rato no te define. Si necesitas desahogarte, llámame, no importa la hora.\n\nY si no quieres hablar, solo lee esto y recuerda que estoy increíblemente orgulloso de ti todos los días.\n\nTodo va a estar bien. Te mando un beso gigante en la frente."
+            },
+            {
+                label: "Ábrelo cuando",
+                title: "no puedas dormir",
+                content: "Cielo,\n\nSi estás leyendo esto es porque tu cabecita no para de dar vueltas en la madrugada.\n\nIntenta soltar el teléfono después de leer esto. Acomódate bien en la almohada y piensa en nuestra próxima cita, o en ese viaje que queremos hacer.\n\nYo seguramente estaré durmiendo (o programando), pero mi corazón está velando tus sueños.\n\nDescansa, mi amor. Mañana será un día mejor."
+            },
+            {
+                label: "Ábrelo cuando",
+                title: "necesites una sonrisa",
+                content: "¡Sorpresa!\n\nSolo escribía esto para recordarte que tienes la sonrisa más bonita que he visto en mi vida.\n\n¿Te acuerdas de [Inserta aquí una anécdota graciosa o chiste interno vuestro]?\n\nEspero haberte sacado al menos una pequeña sonrisa. Eres luz. Sigue brillando hoy.\n\nTe adoro."
+            }
+        ];
+
+        const grid = document.querySelector('.cards-grid');
+        const overlay = document.getElementById('overlay');
+        const lockedModal = document.getElementById('locked-modal');
+        const letterView = document.getElementById('letter-view');
+        const letterTitle = document.getElementById('letter-title');
+        const letterContent = document.getElementById('letter-content');
+
+        const nazarSVG = `
+            <svg class="nazar-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="48" fill="#0f2b5a"/>
+                <circle cx="50" cy="50" r="35" fill="#ffffff"/>
+                <circle cx="50" cy="50" r="22" fill="#4cb1f7"/>
+                <circle cx="50" cy="50" r="10" fill="#0a1120"/>
+            </svg>`;
+
+        lettersData.forEach((data, index) => {
+            const card = document.createElement('button');
+            card.className = 'card';
+            card.type = 'button';
+            card.onclick = () => handleCardClick(index);
+            card.innerHTML = `
+                <span class="nazar-seal">${nazarSVG}</span>
+                <span class="card-label">${data.label}</span>
+                <span class="card-title">${data.title}</span>`;
+            grid.appendChild(card);
+        });
+
+        function handleCardClick(index) {
+            if (unlockedLetters[index] === true) {
+                lockedModal.style.display = 'none';
+                letterView.style.display = 'block';
+                overlay.classList.remove('center');
+                letterTitle.innerText = lettersData[index].title;
+                letterContent.innerText = lettersData[index].content;
+            } else {
+                letterView.style.display = 'none';
+                lockedModal.style.display = 'block';
+                overlay.classList.add('center');
+            }
+            overlay.classList.add('active');
+        }
+
+        function closeModal() {
+            overlay.classList.remove('active');
+            setTimeout(() => {
+                lockedModal.style.display = 'none';
+                letterView.style.display = 'none';
+            }, 300);
+        }
+
+        // Cerrar al tocar fuera del contenido
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) closeModal();
+        });
+    </script>
+</body>
+</html>
