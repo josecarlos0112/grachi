@@ -219,17 +219,27 @@
         }
         .btn:hover { background: var(--accent-gold); }
 
+        /* Contenedor carta + fotos */
+        .letter-wrapper {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+            max-width: 820px;
+            width: 100%;
+            animation: letterIn 0.6s cubic-bezier(.22,1,.36,1) both;
+        }
+
         /* Vista de carta */
         .letter-view {
             background: var(--paper-bg);
             width: 100%;
             max-width: 400px;
+            flex-shrink: 0;
             border-radius: 4px;
             padding: 50px 30px;
             color: var(--text-dark);
             position: relative;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            animation: letterIn 0.6s cubic-bezier(.22,1,.36,1) both;
         }
         .letter-view::before {
             content: '';
@@ -271,6 +281,39 @@
             transition: all 0.3s;
         }
         .close-letter-btn:hover { background: var(--nazar-dark); color: #fff; }
+
+        /* Panel de fotos (oculto hasta que agregues imágenes) */
+        .letter-photos {
+            display: none; /* ← cambia a flex cuando tengas fotos */
+            flex-direction: column;
+            gap: 12px;
+            max-width: 360px;
+            width: 100%;
+        }
+        .letter-photos img {
+            width: 100%;
+            border-radius: 4px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+            object-fit: cover;
+        }
+        .letter-photos .photo-caption {
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.55);
+            text-align: center;
+            margin-top: -4px;
+        }
+
+        @media (max-width: 700px) {
+            .letter-wrapper {
+                flex-direction: column;
+                align-items: center;
+            }
+            .letter-photos {
+                max-width: 400px;
+            }
+        }
 
         @keyframes pop { from { transform: translateY(14px) scale(.96); } to { transform: translateY(0) scale(1); } }
         @keyframes letterIn { from { transform: translateY(26px); } to { transform: translateY(0); } }
@@ -316,21 +359,26 @@
             <button class="btn" onclick="closeModal()">Entendido</button>
         </div>
 
-        <!-- Modal: la carta real -->
-        <div class="letter-view" id="letter-view" style="display: none;">
-            <div class="letter-header">
-                <span class="nazar-seal">
-                    <svg class="nazar-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="50" cy="50" r="48" fill="#0f2b5a"/>
-                        <circle cx="50" cy="50" r="35" fill="#ffffff"/>
-                        <circle cx="50" cy="50" r="22" fill="#4cb1f7"/>
-                        <circle cx="50" cy="50" r="10" fill="#0a1120"/>
-                    </svg>
-                </span>
-                <h2 id="letter-title">Título</h2>
+        <!-- Modal: carta + fotos -->
+        <div class="letter-wrapper" id="letter-wrapper" style="display: none;">
+            <div class="letter-view" id="letter-view">
+                <div class="letter-header">
+                    <span class="nazar-seal">
+                        <svg class="nazar-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="50" cy="50" r="48" fill="#0f2b5a"/>
+                            <circle cx="50" cy="50" r="35" fill="#ffffff"/>
+                            <circle cx="50" cy="50" r="22" fill="#4cb1f7"/>
+                            <circle cx="50" cy="50" r="10" fill="#0a1120"/>
+                        </svg>
+                    </span>
+                    <h2 id="letter-title">Título</h2>
+                </div>
+                <div class="letter-body" id="letter-content">Contenido de la carta...</div>
+                <button class="close-letter-btn" onclick="closeModal()">Guardar en mi corazón</button>
             </div>
-            <div class="letter-body" id="letter-content">Contenido de la carta...</div>
-            <button class="close-letter-btn" onclick="closeModal()">Guardar en mi corazón</button>
+
+            <!-- Panel de fotos — agrega tus imágenes en lettersData.images y descomenta -->
+            <div class="letter-photos" id="letter-photos"></div>
         </div>
 
     </div>
@@ -353,31 +401,49 @@
             {
                 label: "Ábrelo cuando",
                 title: "me extrañes",
+                images: [
+                    // { src: "fotos/extrañes-1.jpg", alt: "Nosotros", caption: "Nuestro momento" }
+                ],
                 content: "Mi amor,\n\nSé que la distancia a veces pesa mucho y los días sin vernos se sienten eternos.\n\nPero quiero que sepas que aunque no pueda abrazarte físicamente ahora mismo, estás en cada uno de mis pensamientos. Cierra los ojos un segundo, respira profundo e imagíname ahí contigo.\n\nFalta un día menos para volver a vernos.\n\nTe amo muchísimo."
             },
             {
                 label: "Ábrelo cuando",
                 title: "tengas un mal día",
+                images: [
+                    // { src: "fotos/extrañes-1.jpg", alt: "Nosotros", caption: "Nuestro momento" }
+                ],
                 content: "¡Hey, mi niña hermosa!\n\nRespira. Sé que hoy las cosas no salieron como querías y que todo parece gris.\n\nRecuerda lo fuerte y capaz que eres. Este mal rato no te define. Si necesitas desahogarte, llámame, no importa la hora.\n\nY si no quieres hablar, solo lee esto y recuerda que estoy increíblemente orgulloso de ti todos los días.\n\nTodo va a estar bien. Te mando un beso gigante en la frente."
             },
             {
                 label: "Ábrelo cuando",
                 title: "no puedas dormir",
+                images: [
+                    // { src: "fotos/extrañes-1.jpg", alt: "Nosotros", caption: "Nuestro momento" }
+                ],
                 content: "Cielo,\n\nSi estás leyendo esto es porque tu cabecita no para de dar vueltas en la madrugada.\n\nIntenta soltar el teléfono después de leer esto. Acomódate bien en la almohada y piensa en nuestra próxima cita, o en ese viaje que queremos hacer.\n\nYo seguramente estaré durmiendo (o programando), pero mi corazón está velando tus sueños.\n\nDescansa, mi amor. Mañana será un día mejor."
             },
             {
                 label: "Ábrelo cuando",
                 title: "necesites una sonrisa",
+                images: [
+                    // { src: "fotos/extrañes-1.jpg", alt: "Nosotros", caption: "Nuestro momento" }
+                ],
                 content: "¡Sorpresa!\n\nSolo escribía esto para recordarte que tienes la sonrisa más bonita que he visto en mi vida.\n\n¿Te acuerdas cuando me pisaste mientras bailamos por primera vez? No lo vuelvas a hacer o llamaré a los chamos.\n\nEspero haberte sacado al menos una pequeña sonrisa. Eres luz. Sigue brillando hoy.\n\nTe adoro."
             },
             {
                 label: "Ábrelo cuando",
                 title: "dudes de ti misma",
+                images: [
+                    // { src: "fotos/extrañes-1.jpg", alt: "Nosotros", caption: "Nuestro momento" }
+                ],
                 content: "Mi amor,\n\nSi estás leyendo esto es porque esa vocecita en tu cabeza te está diciendo que no eres suficiente. Y vengo a decirte que esa voz miente.\n\nYo te veo todos los días: tu esfuerzo, tu dedicación, cómo te levantas aunque estés cansada, cómo das lo mejor de ti incluso cuando nadie te lo pide.\n\nEres muchísimo más capaz de lo que crees. Y no lo digo porque sea tu novio, lo digo porque lo he visto con mis propios ojos una y otra vez.\n\nConfía en ti tanto como yo confío en ti.\n\nTe amo, mi niña valiente."
             },
             {
                 label: "Ábrelo cuando",
                 title: "quieras rendirte",
+                images: [
+                    // { src: "fotos/extrañes-1.jpg", alt: "Nosotros", caption: "Nuestro momento" }
+                ],
                 content: "Oye, para.\n\nAntes de soltar todo, quiero que recuerdes por qué empezaste. Piensa en la Graciela del pasado que tomó la decisión, que dijo \"yo puedo con esto\". Esa eres tú. Sigue siendo tú.\n\nNo tienes que hacerlo perfecto. No tienes que hacerlo rápido. Solo tienes que seguir, un pasito a la vez.\n\nY si de verdad sientes que no puedes sola, aquí estoy. Llámame, escríbeme, mándame un audio llorando si quieres. No me importa la hora ni el momento.\n\nNo estás sola en esto. Nunca lo estarás.\n\nTu Jotace, siempre en tu bando brrr."
             }
         ];
@@ -385,9 +451,11 @@
         const grid = document.querySelector('.cards-grid');
         const overlay = document.getElementById('overlay');
         const lockedModal = document.getElementById('locked-modal');
+        const letterWrapper = document.getElementById('letter-wrapper');
         const letterView = document.getElementById('letter-view');
         const letterTitle = document.getElementById('letter-title');
         const letterContent = document.getElementById('letter-content');
+        const letterPhotos = document.getElementById('letter-photos');
 
         const nazarSVG = `
             <svg class="nazar-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
@@ -412,12 +480,32 @@
         function handleCardClick(index) {
             if (unlockedLetters[index] === true) {
                 lockedModal.style.display = 'none';
-                letterView.style.display = 'block';
+                letterWrapper.style.display = 'flex';
                 overlay.classList.remove('center');
                 letterTitle.innerText = lettersData[index].title;
                 letterContent.innerText = lettersData[index].content;
+
+                const images = lettersData[index].images || [];
+                letterPhotos.innerHTML = '';
+                if (images.length > 0) {
+                    letterPhotos.style.display = 'flex';
+                    images.forEach(img => {
+                        const imgEl = document.createElement('img');
+                        imgEl.src = img.src;
+                        imgEl.alt = img.alt || '';
+                        letterPhotos.appendChild(imgEl);
+                        if (img.caption) {
+                            const cap = document.createElement('span');
+                            cap.className = 'photo-caption';
+                            cap.textContent = img.caption;
+                            letterPhotos.appendChild(cap);
+                        }
+                    });
+                } else {
+                    letterPhotos.style.display = 'none';
+                }
             } else {
-                letterView.style.display = 'none';
+                letterWrapper.style.display = 'none';
                 lockedModal.style.display = 'block';
                 overlay.classList.add('center');
             }
@@ -428,7 +516,7 @@
             overlay.classList.remove('active');
             setTimeout(() => {
                 lockedModal.style.display = 'none';
-                letterView.style.display = 'none';
+                letterWrapper.style.display = 'none';
             }, 300);
         }
 
