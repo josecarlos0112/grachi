@@ -286,23 +286,36 @@
         .letter-photos {
             display: none; /* ← cambia a flex cuando tengas fotos */
             flex-direction: column;
-            gap: 12px;
+            gap: 14px;
             max-width: 360px;
             width: 100%;
+            overflow-y: auto;
+            max-height: 80vh;
+            padding-right: 4px;
         }
-        .letter-photos img {
+        .letter-photos::-webkit-scrollbar { width: 4px; }
+        .letter-photos::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+        .photo-item {
             width: 100%;
-            border-radius: 4px;
+            border-radius: 6px;
+            overflow: hidden;
             box-shadow: 0 6px 18px rgba(0,0,0,0.35);
-            object-fit: cover;
+            background: #1a2a3a;
         }
-        .letter-photos .photo-caption {
+        .photo-item img {
+            width: 100%;
+            height: auto;
+            max-height: 320px;
+            object-fit: cover;
+            display: block;
+        }
+        .photo-caption {
             font-family: 'Cormorant Garamond', serif;
             font-style: italic;
             font-size: 0.85rem;
             color: rgba(255,255,255,0.55);
             text-align: center;
-            margin-top: -4px;
+            padding: 8px 10px;
         }
 
         @media (max-width: 700px) {
@@ -442,7 +455,7 @@
                 label: "Ábrelo cuando",
                 title: "quieras rendirte",
                 images: [
-                    // { src: "fotos/extrañes-1.jpg", alt: "Nosotros", caption: "Nuestro momento" }
+                    { src: "fotos/grachi_niña.png", alt: "Graciela pequeña", caption: "mini Graciela" }
                 ],
                 content: "Oye, para.\n\nAntes de soltar todo, quiero que recuerdes por qué empezaste. Piensa en la Graciela del pasado que tomó la decisión, que dijo \"yo puedo con esto\". Esa eres tú. Sigue siendo tú.\n\nNo tienes que hacerlo perfecto. No tienes que hacerlo rápido. Solo tienes que seguir, un pasito a la vez.\n\nY si de verdad sientes que no puedes sola, aquí estoy. Llámame, escríbeme, mándame un audio llorando si quieres. No me importa la hora ni el momento.\n\nNo estás sola en esto. Nunca lo estarás.\n\nTu Jotace, siempre en tu bando brrr."
             }
@@ -490,16 +503,19 @@
                 if (images.length > 0) {
                     letterPhotos.style.display = 'flex';
                     images.forEach(img => {
+                        const item = document.createElement('div');
+                        item.className = 'photo-item';
                         const imgEl = document.createElement('img');
                         imgEl.src = img.src;
                         imgEl.alt = img.alt || '';
-                        letterPhotos.appendChild(imgEl);
+                        item.appendChild(imgEl);
                         if (img.caption) {
                             const cap = document.createElement('span');
                             cap.className = 'photo-caption';
                             cap.textContent = img.caption;
-                            letterPhotos.appendChild(cap);
+                            item.appendChild(cap);
                         }
+                        letterPhotos.appendChild(item);
                     });
                 } else {
                     letterPhotos.style.display = 'none';
