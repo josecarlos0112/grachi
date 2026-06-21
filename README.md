@@ -8,14 +8,22 @@ Monorepo: cada carpeta es un producto/mini-proyecto independiente y autocontenid
 | Proyecto | Descripción | Demo local |
 |----------|-------------|------------|
 | [`cartas/`](./cartas) | Sobres digitales "Ábrelo cuando…" estilo nazar (ojo turco). | `cartas/index.html` |
+| [`audiencias-virtuales/`](./audiencias-virtuales) | Cinco mini-juegos sueltos, tema "Tribunal de la Distancia"; cada uno reparte un premio al azar (regalo real o promesa) de un pozo compartido. | `audiencias-virtuales/*.html` |
 
 ## Estructura
 
 ```
 grachi/
 ├── README.md
-└── cartas/
-    ├── index.html      ← abre directo en el navegador
+├── cartas/
+│   ├── index.html      ← abre directo en el navegador
+│   └── README.md
+└── audiencias-virtuales/
+    ├── ruleta_audiencias.html
+    ├── sello_confidencial.html
+    ├── examen_barra_amor.html
+    ├── reconstruye_pruebas.html
+    ├── recurso_inapelable.html
     └── README.md
 ```
 

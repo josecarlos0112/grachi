@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Examen de la Barra del Amor a Distancia</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root {
+    --cream: #f0e4d7;
+    --pink: #f9d5e5;
+    --pink2: #f3bcd4;
+    --accent: #d81159;
+    --gold: #c9a227;
+    --ink: #3a2e2e;
+    --green: #4c9a6a;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--cream);
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 16px;
+  }
+
+  .eyebrow {
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-size: 12px;
+    color: var(--gold);
+    margin: 0 0 6px;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  h1 {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 22px;
+    margin: 0 0 6px;
+    color: var(--accent);
+    text-align: center;
+  }
+
+  .subtitle {
+    text-align: center;
+    max-width: 320px;
+    margin: 0 0 22px;
+    font-size: 14px;
+    opacity: 0.85;
+  }
+
+  #progressBar {
+    width: 100%;
+    max-width: 340px;
+    height: 6px;
+    background: rgba(0,0,0,0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 22px;
+  }
+  #progressFill {
+    height: 100%;
+    width: 0%;
+    background: var(--accent);
+    transition: width 0.4s;
+  }
+
+  #quizCard {
+    background: white;
+    border-radius: 16px;
+    padding: 26px 22px;
+    max-width: 340px;
+    width: 100%;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.12);
+  }
+
+  #questionNum {
+    font-size: 12px;
+    color: var(--gold);
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+
+  #questionText {
+    font-size: 18px;
+    margin: 0 0 18px;
+    font-weight: 600;
+    line-height: 1.35;
+  }
+
+  .option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: var(--pink);
+    border: none;
+    border-radius: 10px;
+    padding: 13px 16px;
+    margin-bottom: 10px;
+    font-size: 15px;
+    cursor: pointer;
+    color: var(--ink);
+    transition: background 0.2s, transform 0.1s;
+  }
+  .option:active { transform: scale(0.98); }
+  .option.correct { background: var(--green); color: white; }
+  .option.wrong { background: #d96868; color: white; }
+  .option:disabled { cursor: default; }
+
+  #nextBtn {
+    margin-top: 10px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 11px 26px;
+    border-radius: 24px;
+    font-size: 14px;
+    cursor: pointer;
+    display: none;
+  }
+
+  #finalScreen {
+    display: none;
+    background: white;
+    border-radius: 16px;
+    padding: 30px 24px;
+    max-width: 340px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.12);
+  }
+
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+  }
+  .badge-real { background: rgba(201,162,39,0.15); color: var(--gold); border: 1px solid var(--gold); }
+  .badge-promesa { background: rgba(216,17,89,0.1); color: var(--accent); border: 1px solid var(--accent); }
+
+  .stamp {
+    display: inline-block;
+    border: 3px solid var(--accent);
+    color: var(--accent);
+    font-family: Georgia, serif;
+    font-weight: bold;
+    letter-spacing: 1.5px;
+    padding: 6px 14px;
+    border-radius: 8px;
+    transform: rotate(-8deg) scale(0);
+    margin-bottom: 16px;
+    font-size: 13px;
+    transition: transform 0.4s cubic-bezier(.34,1.56,.64,1);
+  }
+  .stamp.show { transform: rotate(-8deg) scale(1); }
+
+  #scoreText {
+    font-size: 15px;
+    margin-bottom: 10px;
+    opacity: 0.8;
+  }
+
+  #verdictText {
+    font-size: 17px;
+    line-height: 1.5;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+
+  <p class="eyebrow">Causa N.º 003 — Tribunal de la Distancia</p>
+  <h1>Examen de la Barra del Amor a Distancia</h1>
+  <p class="subtitle">Para certificar que los kilómetros no nos han hecho olvidar nada. (Spoiler: el puntaje no afecta el veredicto.)</p>
+
+  <div id="progressBar"><div id="progressFill"></div></div>
+
+  <div id="quizCard">
+    <div id="questionNum"></div>
+    <p id="questionText"></p>
+    <div id="optionsWrap"></div>
+    <button id="nextBtn">Siguiente →</button>
+  </div>
+
+  <div id="finalScreen">
+    <div class="stamp" id="stamp">APROBADO ⚖️</div>
+    <div id="badgeWrap"></div>
+    <p id="scoreText"></p>
+    <p id="verdictText"></p>
+  </div>
+
+<script>
+  /* =========================================================================
+     EDITA AQUÍ: tus preguntas. "correcta" es el índice (0,1,2...) de la
+     opción correcta. El puntaje es decorativo: el premio final sale del
+     pozo PREMIOS sin importar cuántas aciertes.
+  ========================================================================= */
+  const preguntas = [
+    {
+      texto: "¿Cuántos husos horarios nos separan ahora mismo?",
+      opciones: ["Opción A", "Opción B", "Opción C"],
+      correcta: 0
+    },
+    {
+      texto: "¿Cuál fue la primera película o serie que 'vimos juntos' por videollamada?",
+      opciones: ["Opción A", "Opción B", "Opción C"],
+      correcta: 1
+    },
+    {
+      texto: "¿Qué hora es allá cuando aquí son las 9 p.m.?",
+      opciones: ["Opción A", "Opción B", "Opción C"],
+      correcta: 2
+    },
+    {
+      texto: "¿Cuánto tiempo llevamos en esta distancia?",
+      opciones: ["Opción A", "Opción B", "Opción C"],
+      correcta: 0
+    },
+    {
+      texto: "¿Cuál fue el último regalo sorpresa que te mandé?",
+      opciones: ["Opción A", "Opción B", "Opción C"],
+      correcta: 1
+    }
+  ];
+
+  /* Mismo pozo de premios duplicado en los 5 juegos. */
+  const PREMIOS = [
+    { tipo: "real",    emoji: "🌷", texto: "Delivery de flores a tu puerta, sin razón aparente." },
+    { tipo: "real",    emoji: "🍫", texto: "Delivery de tus dulces favoritos, ya en camino." },
+    { tipo: "real",    emoji: "📦", texto: "Un regalo físico sorpresa, en camino por correo." },
+    { tipo: "real",    emoji: "💌", texto: "Una carta escrita a mano, enviada por correo postal." },
+    { tipo: "promesa", emoji: "🎥", texto: "Noche de película sincronizada por videollamada. Tú eliges la fecha." },
+    { tipo: "promesa", emoji: "🍽️", texto: "Cuando nos veamos: una cena, tú eliges el lugar." },
+    { tipo: "promesa", emoji: "🏖️", texto: "Cuando nos veamos: un día completo de playa." },
+    { tipo: "promesa", emoji: "🌳", texto: "Cuando nos veamos: un picnic en el parque." },
+    { tipo: "promesa", emoji: "✈️", texto: "Promesa de visita: yo organizo el viaje." },
+    { tipo: "promesa", emoji: "📞", texto: "Una llamada de una hora, sin pantallas de por medio, solo para hablar." }
+  ];
+
+  function premioAlAzar() {
+    return PREMIOS[Math.floor(Math.random() * PREMIOS.length)];
+  }
+
+  function badgeHTML(premio) {
+    return premio.tipo === 'real'
+      ? '<span class="badge badge-real">📬 Regalo real</span>'
+      : '<span class="badge badge-promesa">🤝 Promesa</span>';
+  }
+
+  let current = 0;
+  let score = 0;
+
+  const questionNum = document.getElementById('questionNum');
+  const questionText = document.getElementById('questionText');
+  const optionsWrap = document.getElementById('optionsWrap');
+  const nextBtn = document.getElementById('nextBtn');
+  const progressFill = document.getElementById('progressFill');
+  const quizCard = document.getElementById('quizCard');
+  const finalScreen = document.getElementById('finalScreen');
+  const scoreText = document.getElementById('scoreText');
+  const verdictText = document.getElementById('verdictText');
+  const badgeWrap = document.getElementById('badgeWrap');
+  const stamp = document.getElementById('stamp');
+
+  function renderQuestion() {
+    const q = preguntas[current];
+    questionNum.textContent = `Pregunta ${current + 1} de ${preguntas.length}`;
+    questionText.textContent = q.texto;
+    optionsWrap.innerHTML = '';
+    nextBtn.style.display = 'none';
+
+    q.opciones.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'option';
+      btn.textContent = opt;
+      btn.addEventListener('click', () => selectAnswer(i, btn));
+      optionsWrap.appendChild(btn);
+    });
+
+    progressFill.style.width = `${(current / preguntas.length) * 100}%`;
+  }
+
+  function selectAnswer(index, btnEl) {
+    const q = preguntas[current];
+    const allBtns = optionsWrap.querySelectorAll('.option');
+    allBtns.forEach(b => b.disabled = true);
+
+    if (index === q.correcta) {
+      btnEl.classList.add('correct');
+      score++;
+    } else {
+      btnEl.classList.add('wrong');
+      allBtns[q.correcta].classList.add('correct');
+    }
+
+    nextBtn.style.display = 'inline-block';
+  }
+
+  nextBtn.addEventListener('click', () => {
+    current++;
+    if (current < preguntas.length) {
+      renderQuestion();
+    } else {
+      progressFill.style.width = '100%';
+      quizCard.style.display = 'none';
+      finalScreen.style.display = 'block';
+      scoreText.textContent = `Resultado: ${score} de ${preguntas.length} correctas`;
+
+      const premio = premioAlAzar();
+      badgeWrap.innerHTML = badgeHTML(premio);
+      verdictText.innerHTML = `Apruebas con honores (o sin ellos, da igual).<br><br>Se concede de forma inapelable:<br><strong>${premio.texto}</strong>`;
+
+      setTimeout(() => stamp.classList.add('show'), 200);
+    }
+  });
+
+  renderQuestion();
+</script>
+</body>
+</html>

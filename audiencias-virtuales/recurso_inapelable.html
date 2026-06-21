@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Recurso Inapelable</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root {
+    --cream: #f0e4d7;
+    --pink: #f9d5e5;
+    --pink2: #f3bcd4;
+    --accent: #d81159;
+    --gold: #c9a227;
+    --ink: #3a2e2e;
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--cream);
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 16px;
+  }
+
+  .eyebrow {
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-size: 12px;
+    color: var(--gold);
+    margin: 0 0 6px;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  h1 {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 24px;
+    margin: 0 0 6px;
+    color: var(--accent);
+    text-align: center;
+  }
+
+  .subtitle {
+    text-align: center;
+    max-width: 320px;
+    margin: 0 0 8px;
+    font-size: 14px;
+    opacity: 0.85;
+  }
+
+  #status {
+    font-size: 13px;
+    color: var(--gold);
+    font-weight: 700;
+    margin-bottom: 18px;
+    height: 18px;
+  }
+
+  #board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 6px;
+    width: 270px;
+    height: 270px;
+    background: white;
+    padding: 6px;
+    border-radius: 14px;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+  }
+
+  .cell {
+    background: var(--pink);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 42px;
+    font-weight: 700;
+    cursor: pointer;
+    user-select: none;
+  }
+  .cell.x { color: var(--accent); }
+  .cell.o { color: var(--ink); }
+  .cell.disabled { cursor: default; }
+
+  #resetBtn {
+    margin-top: 20px;
+    background: transparent;
+    color: var(--ink);
+    border: 1.5px solid var(--ink);
+    padding: 9px 20px;
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+    opacity: 0.75;
+  }
+
+  .modal-bg {
+    position: fixed;
+    inset: 0;
+    background: rgba(58,46,46,0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    z-index: 10;
+  }
+  .modal-bg.show { opacity: 1; pointer-events: all; }
+
+  .modal {
+    background: white;
+    border-radius: 16px;
+    padding: 34px 26px 26px;
+    max-width: 300px;
+    text-align: center;
+    transform: scale(0.7);
+    transition: transform 0.35s cubic-bezier(.34,1.56,.64,1);
+  }
+  .modal-bg.show .modal { transform: scale(1); }
+
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+  }
+  .badge-real { background: rgba(201,162,39,0.15); color: var(--gold); border: 1px solid var(--gold); }
+  .badge-promesa { background: rgba(216,17,89,0.1); color: var(--accent); border: 1px solid var(--accent); }
+
+  .stamp {
+    display: inline-block;
+    border: 3px solid var(--accent);
+    color: var(--accent);
+    font-family: Georgia, serif;
+    font-weight: bold;
+    letter-spacing: 1.5px;
+    padding: 6px 14px;
+    border-radius: 8px;
+    transform: rotate(-8deg);
+    margin-bottom: 14px;
+    font-size: 13px;
+  }
+
+  #modalText { font-size: 16px; line-height: 1.5; margin: 0 0 20px; }
+
+  #closeBtn {
+    background: var(--ink);
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 24px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+</style>
+</head>
+<body>
+
+  <p class="eyebrow">Causa N.º 005 — Tribunal de la Distancia</p>
+  <h1>Recurso Inapelable</h1>
+  <p class="subtitle">Juegas contra el Juez. Contra la distancia casi nunca se gana — contra este tablero, tampoco.</p>
+  <div id="status">Tú eres ❌. Empiezas tú.</div>
+
+  <div id="board"></div>
+  <button id="resetBtn">🔁 Nuevo juicio</button>
+
+  <div class="modal-bg" id="modalBg">
+    <div class="modal">
+      <div class="stamp" id="stamp">FALLO ⚖️</div>
+      <div id="badgeWrap"></div>
+      <p id="modalText"></p>
+      <button id="closeBtn">Cerrar</button>
+    </div>
+  </div>
+
+<script>
+  /* Mismo pozo de premios duplicado en los 5 juegos. EDITA AQUÍ. */
+  const PREMIOS = [
+    { tipo: "real",    emoji: "🌷", texto: "Delivery de flores a tu puerta, sin razón aparente." },
+    { tipo: "real",    emoji: "🍫", texto: "Delivery de tus dulces favoritos, ya en camino." },
+    { tipo: "real",    emoji: "📦", texto: "Un regalo físico sorpresa, en camino por correo." },
+    { tipo: "real",    emoji: "💌", texto: "Una carta escrita a mano, enviada por correo postal." },
+    { tipo: "promesa", emoji: "🎥", texto: "Noche de película sincronizada por videollamada. Tú eliges la fecha." },
+    { tipo: "promesa", emoji: "🍽️", texto: "Cuando nos veamos: una cena, tú eliges el lugar." },
+    { tipo: "promesa", emoji: "🏖️", texto: "Cuando nos veamos: un día completo de playa." },
+    { tipo: "promesa", emoji: "🌳", texto: "Cuando nos veamos: un picnic en el parque." },
+    { tipo: "promesa", emoji: "✈️", texto: "Promesa de visita: yo organizo el viaje." },
+    { tipo: "promesa", emoji: "📞", texto: "Una llamada de una hora, sin pantallas de por medio, solo para hablar." }
+  ];
+
+  function premioAlAzar() {
+    return PREMIOS[Math.floor(Math.random() * PREMIOS.length)];
+  }
+
+  function badgeHTML(premio) {
+    return premio.tipo === 'real'
+      ? '<span class="badge badge-real">📬 Regalo real</span>'
+      : '<span class="badge badge-promesa">🤝 Promesa</span>';
+  }
+
+  function stampFor(premio) {
+    return premio.tipo === 'real' ? 'ENTREGA AUTORIZADA ⚖️' : 'PROMESA REGISTRADA ⚖️';
+  }
+
+  const HUMAN = 'X';
+  const AI = 'O';
+  let board = Array(9).fill(null);
+  let gameOver = false;
+
+  const boardEl = document.getElementById('board');
+  const statusEl = document.getElementById('status');
+  const modalBg = document.getElementById('modalBg');
+  const modalText = document.getElementById('modalText');
+  const badgeWrap = document.getElementById('badgeWrap');
+  const stampEl = document.getElementById('stamp');
+  const closeBtn = document.getElementById('closeBtn');
+  const resetBtn = document.getElementById('resetBtn');
+
+  const WIN_LINES = [
+    [0,1,2],[3,4,5],[6,7,8],
+    [0,3,6],[1,4,7],[2,5,8],
+    [0,4,8],[2,4,6]
+  ];
+
+  function checkWinner(b) {
+    for (const [a,c,d] of WIN_LINES) {
+      if (b[a] && b[a] === b[c] && b[a] === b[d]) return b[a];
+    }
+    if (b.every(cell => cell !== null)) return 'draw';
+    return null;
+  }
+
+  function minimax(b, isMaximizing) {
+    const winner = checkWinner(b);
+    if (winner === AI) return { score: 1 };
+    if (winner === HUMAN) return { score: -1 };
+    if (winner === 'draw') return { score: 0 };
+
+    const moves = [];
+    for (let i = 0; i < 9; i++) {
+      if (b[i] === null) {
+        const newBoard = [...b];
+        newBoard[i] = isMaximizing ? AI : HUMAN;
+        const result = minimax(newBoard, !isMaximizing);
+        moves.push({ index: i, score: result.score });
+      }
+    }
+
+    if (isMaximizing) {
+      return moves.reduce((best, m) => m.score > best.score ? m : best);
+    } else {
+      return moves.reduce((best, m) => m.score < best.score ? m : best);
+    }
+  }
+
+  function render() {
+    boardEl.innerHTML = '';
+    board.forEach((val, i) => {
+      const cell = document.createElement('div');
+      cell.className = 'cell' + (val === 'X' ? ' x' : val === 'O' ? ' o' : '') + (gameOver ? ' disabled' : '');
+      cell.textContent = val === 'X' ? '❌' : val === 'O' ? '⭕' : '';
+      cell.addEventListener('click', () => humanMove(i));
+      boardEl.appendChild(cell);
+    });
+  }
+
+  function humanMove(i) {
+    if (gameOver || board[i] !== null) return;
+    board[i] = HUMAN;
+    render();
+    const result = checkWinner(board);
+    if (result) { endGame(result); return; }
+
+    statusEl.textContent = 'El Juez está deliberando...';
+    setTimeout(aiMove, 500);
+  }
+
+  function aiMove() {
+    if (gameOver) return;
+    const best = minimax(board, true);
+    board[best.index] = AI;
+    render();
+    const result = checkWinner(board);
+    if (result) { endGame(result); return; }
+    statusEl.textContent = 'Tu turno.';
+  }
+
+  function endGame(result) {
+    gameOver = true;
+    render();
+
+    const premio = premioAlAzar();
+    stampEl.textContent = stampFor(premio);
+    badgeWrap.innerHTML = badgeHTML(premio);
+
+    let intro;
+    if (result === 'draw') {
+      statusEl.textContent = 'Empate.';
+      intro = 'Empate técnico. Ni ganas ni pierdes contra el Juez, igual que con la distancia.';
+    } else if (result === AI) {
+      statusEl.textContent = 'Gana el Juez.';
+      intro = 'El tribunal falla en tu contra, como era de esperar.';
+    } else {
+      statusEl.textContent = '¡Ganaste!';
+      intro = 'Has vencido al tribunal. Caso histórico.';
+    }
+    modalText.innerHTML = `${intro}<br><br>Como compensación:<br><strong>${premio.texto}</strong>`;
+
+    setTimeout(() => modalBg.classList.add('show'), 300);
+  }
+
+  function reset() {
+    board = Array(9).fill(null);
+    gameOver = false;
+    statusEl.textContent = 'Tú eres ❌. Empiezas tú.';
+    modalBg.classList.remove('show');
+    render();
+  }
+
+  closeBtn.addEventListener('click', () => modalBg.classList.remove('show'));
+  resetBtn.addEventListener('click', reset);
+
+  render();
+</script>
+</body>
+</html>

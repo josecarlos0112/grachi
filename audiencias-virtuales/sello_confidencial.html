@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Sello Confidencial</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root {
+    --cream: #f0e4d7;
+    --pink: #f9d5e5;
+    --pink2: #f3bcd4;
+    --accent: #d81159;
+    --gold: #c9a227;
+    --ink: #3a2e2e;
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--cream);
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 16px;
+    overflow-x: hidden;
+  }
+
+  .eyebrow {
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-size: 12px;
+    color: var(--gold);
+    margin: 0 0 6px;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  h1 {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 25px;
+    margin: 0 0 6px;
+    color: var(--accent);
+    text-align: center;
+  }
+
+  .subtitle {
+    text-align: center;
+    max-width: 300px;
+    margin: 0 0 26px;
+    font-size: 14px;
+    opacity: 0.85;
+  }
+
+  #card {
+    position: relative;
+    width: 300px;
+    height: 210px;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 12px 28px rgba(0,0,0,0.22);
+    border: 2px solid white;
+  }
+
+  #revealLayer {
+    position: absolute;
+    inset: 0;
+    background: var(--pink);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    margin-bottom: 8px;
+  }
+  .badge-real { background: rgba(201,162,39,0.15); color: var(--gold); border: 1px solid var(--gold); }
+  .badge-promesa { background: rgba(216,17,89,0.1); color: var(--accent); border: 1px solid var(--accent); }
+
+  .stamp {
+    display: inline-block;
+    border: 3px solid var(--accent);
+    color: var(--accent);
+    font-family: Georgia, serif;
+    font-weight: bold;
+    letter-spacing: 1.5px;
+    padding: 5px 12px;
+    border-radius: 8px;
+    transform: rotate(-8deg) scale(0);
+    margin-bottom: 10px;
+    font-size: 12px;
+    transition: transform 0.4s cubic-bezier(.34,1.56,.64,1);
+  }
+  .stamp.show { transform: rotate(-8deg) scale(1); }
+
+  #revealText {
+    font-size: 16px;
+    line-height: 1.4;
+    margin: 0;
+    font-weight: 600;
+  }
+
+  #scratchCanvas {
+    position: absolute;
+    inset: 0;
+    cursor: pointer;
+    touch-action: none;
+  }
+
+  #hint {
+    margin-top: 16px;
+    font-size: 13px;
+    opacity: 0.7;
+    text-align: center;
+  }
+
+  .confetti {
+    position: fixed;
+    width: 6px;
+    height: 6px;
+    opacity: 0.7;
+    border-radius: 50%;
+    top: -10px;
+    z-index: 20;
+  }
+  @keyframes fall {
+    to { transform: translateY(110vh) rotate(360deg); }
+  }
+</style>
+</head>
+<body>
+
+  <p class="eyebrow">Causa N.º 002 — Tribunal de la Distancia</p>
+  <h1>Sello Confidencial</h1>
+  <p class="subtitle">Documento enviado a kilómetros de distancia. Raspa con el dedo para desclasificarlo.</p>
+
+  <div id="card">
+    <div id="revealLayer">
+      <div class="stamp" id="stamp">CASO RESUELTO ⚖️</div>
+      <div id="badgeWrap"></div>
+      <p id="revealText"></p>
+    </div>
+    <canvas id="scratchCanvas"></canvas>
+  </div>
+
+  <p id="hint">👆 Rasca con el dedo para descubrir el veredicto</p>
+
+<script>
+  /* =========================================================================
+     EDITA AQUÍ: el pozo de premios. Mismo array duplicado en los 5 juegos
+     (cada archivo funciona solo, sin depender de los otros). Si cambias
+     algo aquí, cambia también los otros 4 archivos.
+  ========================================================================= */
+  const PREMIOS = [
+    { tipo: "real",    emoji: "🌷", texto: "Delivery de flores a tu puerta, sin razón aparente." },
+    { tipo: "real",    emoji: "🍫", texto: "Delivery de tus dulces favoritos, ya en camino." },
+    { tipo: "real",    emoji: "📦", texto: "Un regalo físico sorpresa, en camino por correo." },
+    { tipo: "real",    emoji: "💌", texto: "Una carta escrita a mano, enviada por correo postal." },
+    { tipo: "promesa", emoji: "🎥", texto: "Noche de película sincronizada por videollamada. Tú eliges la fecha." },
+    { tipo: "promesa", emoji: "🍽️", texto: "Cuando nos veamos: una cena, tú eliges el lugar." },
+    { tipo: "promesa", emoji: "🏖️", texto: "Cuando nos veamos: un día completo de playa." },
+    { tipo: "promesa", emoji: "🌳", texto: "Cuando nos veamos: un picnic en el parque." },
+    { tipo: "promesa", emoji: "✈️", texto: "Promesa de visita: yo organizo el viaje." },
+    { tipo: "promesa", emoji: "📞", texto: "Una llamada de una hora, sin pantallas de por medio, solo para hablar." }
+  ];
+
+  function premioAlAzar() {
+    return PREMIOS[Math.floor(Math.random() * PREMIOS.length)];
+  }
+
+  function badgeHTML(premio) {
+    return premio.tipo === 'real'
+      ? '<span class="badge badge-real">📬 Regalo real</span>'
+      : '<span class="badge badge-promesa">🤝 Promesa</span>';
+  }
+
+  function stampFor(premio) {
+    return premio.tipo === 'real' ? 'ENTREGA AUTORIZADA ⚖️' : 'PROMESA REGISTRADA ⚖️';
+  }
+
+  // Se decide el premio UNA vez al cargar la página, y queda oculto bajo
+  // la capa raspable hasta que ella lo descubra.
+  const premio = premioAlAzar();
+  document.getElementById('stamp').textContent = stampFor(premio);
+  document.getElementById('badgeWrap').innerHTML = badgeHTML(premio);
+  document.getElementById('revealText').textContent = premio.texto;
+
+  const canvas = document.getElementById('scratchCanvas');
+  const ctx = canvas.getContext('2d');
+  const card = document.getElementById('card');
+  const stamp = document.getElementById('stamp');
+  const hint = document.getElementById('hint');
+
+  function resize() {
+    canvas.width = card.clientWidth;
+    canvas.height = card.clientHeight;
+    drawCover();
+  }
+
+  function drawCover() {
+    ctx.fillStyle = '#9a9a9a';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = 'rgba(0,0,0,0.08)';
+    for (let y = 0; y < canvas.height; y += 8) {
+      ctx.fillRect(0, y, canvas.width, 1);
+    }
+
+    ctx.save();
+    ctx.translate(canvas.width / 2, canvas.height / 2);
+    ctx.rotate(-15 * Math.PI / 180);
+    ctx.fillStyle = 'rgba(255,255,255,0.9)';
+    ctx.font = 'bold 20px Georgia, serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('DOCUMENTO', 0, -10);
+    ctx.fillText('CONFIDENCIAL', 0, 18);
+    ctx.restore();
+  }
+
+  resize();
+  window.addEventListener('resize', resize);
+
+  let isDrawing = false;
+  let revealed = false;
+
+  function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const point = e.touches ? e.touches[0] : e;
+    return {
+      x: point.clientX - rect.left,
+      y: point.clientY - rect.top
+    };
+  }
+
+  function scratch(e) {
+    if (revealed) return;
+    e.preventDefault();
+    const pos = getPos(e);
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath();
+    ctx.arc(pos.x, pos.y, 22, 0, Math.PI * 2);
+    ctx.fill();
+    checkProgress();
+  }
+
+  function checkProgress() {
+    const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+    let cleared = 0;
+    const total = data.length / 4;
+    for (let i = 3; i < data.length; i += 32) {
+      if (data[i] === 0) cleared++;
+    }
+    const sampled = total / 8;
+    const percent = cleared / sampled;
+    if (percent > 0.45 && !revealed) {
+      revealAll();
+    }
+  }
+
+  function revealAll() {
+    revealed = true;
+    canvas.style.transition = 'opacity 0.5s';
+    canvas.style.opacity = '0';
+    setTimeout(() => canvas.style.display = 'none', 500);
+    stamp.classList.add('show');
+    hint.textContent = '¡Desclasificado! 📜';
+    launchConfetti();
+  }
+
+  canvas.addEventListener('mousedown', () => isDrawing = true);
+  canvas.addEventListener('mouseup', () => isDrawing = false);
+  canvas.addEventListener('mouseleave', () => isDrawing = false);
+  canvas.addEventListener('mousemove', (e) => { if (isDrawing) scratch(e); });
+  canvas.addEventListener('mousedown', scratch);
+
+  canvas.addEventListener('touchstart', scratch);
+  canvas.addEventListener('touchmove', scratch);
+
+  function launchConfetti() {
+    const colors = ['#d81159', '#f9d5e5', '#c9a227', '#f3bcd4'];
+    for (let i = 0; i < 80; i++) {
+      setTimeout(() => {
+        const conf = document.createElement('div');
+        conf.className = 'confetti';
+        conf.style.left = Math.random() * window.innerWidth + 'px';
+        conf.style.background = colors[Math.floor(Math.random() * colors.length)];
+        conf.style.animation = `fall ${2 + Math.random() * 1.5}s linear forwards`;
+        document.body.appendChild(conf);
+        setTimeout(() => conf.remove(), 4000);
+      }, i * 20);
+    }
+  }
+</script>
+</body>
+</html>

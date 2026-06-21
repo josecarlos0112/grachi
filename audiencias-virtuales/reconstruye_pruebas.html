@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Reconstruye las Pruebas</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root {
+    --cream: #f0e4d7;
+    --pink: #f9d5e5;
+    --pink2: #f3bcd4;
+    --accent: #d81159;
+    --gold: #c9a227;
+    --ink: #3a2e2e;
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--cream);
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 16px;
+  }
+
+  .eyebrow {
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-size: 12px;
+    color: var(--gold);
+    margin: 0 0 6px;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  h1 {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 24px;
+    margin: 0 0 6px;
+    color: var(--accent);
+    text-align: center;
+  }
+
+  .subtitle {
+    text-align: center;
+    max-width: 320px;
+    margin: 0 0 10px;
+    font-size: 14px;
+    opacity: 0.85;
+  }
+
+  #moveCounter {
+    font-size: 13px;
+    color: var(--gold);
+    font-weight: 700;
+    margin-bottom: 18px;
+  }
+
+  #puzzle {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 6px;
+    width: 280px;
+    height: 280px;
+    background: white;
+    padding: 6px;
+    border-radius: 14px;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+  }
+
+  .tile {
+    background: var(--pink);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--accent);
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.1s;
+    box-shadow: inset 0 0 0 2px rgba(255,255,255,0.6);
+  }
+  .tile:active { transform: scale(0.95); }
+  .tile.empty {
+    background: transparent;
+    box-shadow: none;
+    cursor: default;
+  }
+
+  #shuffleBtn {
+    margin-top: 20px;
+    background: transparent;
+    color: var(--ink);
+    border: 1.5px solid var(--ink);
+    padding: 9px 20px;
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+    opacity: 0.75;
+  }
+
+  .modal-bg {
+    position: fixed;
+    inset: 0;
+    background: rgba(58,46,46,0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    z-index: 10;
+  }
+  .modal-bg.show { opacity: 1; pointer-events: all; }
+
+  .modal {
+    background: white;
+    border-radius: 16px;
+    padding: 34px 26px 26px;
+    max-width: 300px;
+    text-align: center;
+    transform: scale(0.7);
+    transition: transform 0.35s cubic-bezier(.34,1.56,.64,1);
+  }
+  .modal-bg.show .modal { transform: scale(1); }
+
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+  }
+  .badge-real { background: rgba(201,162,39,0.15); color: var(--gold); border: 1px solid var(--gold); }
+  .badge-promesa { background: rgba(216,17,89,0.1); color: var(--accent); border: 1px solid var(--accent); }
+
+  .stamp {
+    display: inline-block;
+    border: 3px solid var(--accent);
+    color: var(--accent);
+    font-family: Georgia, serif;
+    font-weight: bold;
+    letter-spacing: 1.5px;
+    padding: 6px 14px;
+    border-radius: 8px;
+    transform: rotate(-8deg);
+    margin-bottom: 14px;
+    font-size: 13px;
+  }
+
+  #modalText { font-size: 16px; line-height: 1.5; margin: 0 0 20px; }
+
+  #closeBtn {
+    background: var(--ink);
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 24px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+</style>
+</head>
+<body>
+
+  <p class="eyebrow">Causa N.º 004 — Tribunal de la Distancia</p>
+  <h1>Reconstruye las Pruebas</h1>
+  <p class="subtitle">La distancia desordenó el expediente en el envío. Ordénalo del 1 al 8 para que el caso avance.</p>
+  <div id="moveCounter">Movimientos: 0</div>
+
+  <div id="puzzle"></div>
+
+  <button id="shuffleBtn">🔀 Reordenar</button>
+
+  <div class="modal-bg" id="modalBg">
+    <div class="modal">
+      <div class="stamp" id="stamp">CASO RESUELTO ⚖️</div>
+      <div id="badgeWrap"></div>
+      <p id="modalText"></p>
+      <button id="closeBtn">Cerrar</button>
+    </div>
+  </div>
+
+<script>
+  /* Mismo pozo de premios duplicado en los 5 juegos. EDITA AQUÍ. */
+  const PREMIOS = [
+    { tipo: "real",    emoji: "🌷", texto: "Delivery de flores a tu puerta, sin razón aparente." },
+    { tipo: "real",    emoji: "🍫", texto: "Delivery de tus dulces favoritos, ya en camino." },
+    { tipo: "real",    emoji: "📦", texto: "Un regalo físico sorpresa, en camino por correo." },
+    { tipo: "real",    emoji: "💌", texto: "Una carta escrita a mano, enviada por correo postal." },
+    { tipo: "promesa", emoji: "🎥", texto: "Noche de película sincronizada por videollamada. Tú eliges la fecha." },
+    { tipo: "promesa", emoji: "🍽️", texto: "Cuando nos veamos: una cena, tú eliges el lugar." },
+    { tipo: "promesa", emoji: "🏖️", texto: "Cuando nos veamos: un día completo de playa." },
+    { tipo: "promesa", emoji: "🌳", texto: "Cuando nos veamos: un picnic en el parque." },
+    { tipo: "promesa", emoji: "✈️", texto: "Promesa de visita: yo organizo el viaje." },
+    { tipo: "promesa", emoji: "📞", texto: "Una llamada de una hora, sin pantallas de por medio, solo para hablar." }
+  ];
+
+  function premioAlAzar() {
+    return PREMIOS[Math.floor(Math.random() * PREMIOS.length)];
+  }
+
+  function badgeHTML(premio) {
+    return premio.tipo === 'real'
+      ? '<span class="badge badge-real">📬 Regalo real</span>'
+      : '<span class="badge badge-promesa">🤝 Promesa</span>';
+  }
+
+  function stampFor(premio) {
+    return premio.tipo === 'real' ? 'ENTREGA AUTORIZADA ⚖️' : 'PROMESA REGISTRADA ⚖️';
+  }
+
+  const SOLVED = [1,2,3,4,5,6,7,8,null];
+  let board = [...SOLVED];
+  let moves = 0;
+
+  const puzzleEl = document.getElementById('puzzle');
+  const moveCounter = document.getElementById('moveCounter');
+  const modalBg = document.getElementById('modalBg');
+  const modalText = document.getElementById('modalText');
+  const badgeWrap = document.getElementById('badgeWrap');
+  const stampEl = document.getElementById('stamp');
+  const closeBtn = document.getElementById('closeBtn');
+  const shuffleBtn = document.getElementById('shuffleBtn');
+
+  function render() {
+    puzzleEl.innerHTML = '';
+    board.forEach((val, i) => {
+      const tile = document.createElement('div');
+      tile.className = 'tile' + (val === null ? ' empty' : '');
+      tile.textContent = val === null ? '' : val;
+      tile.addEventListener('click', () => tryMove(i));
+      puzzleEl.appendChild(tile);
+    });
+  }
+
+  function getNeighbors(index) {
+    const row = Math.floor(index / 3);
+    const col = index % 3;
+    const neighbors = [];
+    if (row > 0) neighbors.push(index - 3);
+    if (row < 2) neighbors.push(index + 3);
+    if (col > 0) neighbors.push(index - 1);
+    if (col < 2) neighbors.push(index + 1);
+    return neighbors;
+  }
+
+  function tryMove(index) {
+    const emptyIndex = board.indexOf(null);
+    if (getNeighbors(index).includes(emptyIndex)) {
+      [board[index], board[emptyIndex]] = [board[emptyIndex], board[index]];
+      moves++;
+      moveCounter.textContent = `Movimientos: ${moves}`;
+      render();
+      checkWin();
+    }
+  }
+
+  function checkWin() {
+    const solved = board.every((v, i) => v === SOLVED[i]);
+    if (solved) {
+      const premio = premioAlAzar();
+      stampEl.textContent = stampFor(premio);
+      badgeWrap.innerHTML = badgeHTML(premio);
+      modalText.innerHTML = `Pruebas reconstruidas con éxito.<br><strong>${premio.texto}</strong>`;
+      setTimeout(() => modalBg.classList.add('show'), 250);
+    }
+  }
+
+  function shuffle() {
+    board = [...SOLVED];
+    let emptyIndex = board.indexOf(null);
+    let lastIndex = -1;
+    for (let i = 0; i < 150; i++) {
+      const neighbors = getNeighbors(emptyIndex).filter(n => n !== lastIndex);
+      const next = neighbors[Math.floor(Math.random() * neighbors.length)];
+      [board[emptyIndex], board[next]] = [board[next], board[emptyIndex]];
+      lastIndex = emptyIndex;
+      emptyIndex = next;
+    }
+    moves = 0;
+    moveCounter.textContent = 'Movimientos: 0';
+    render();
+  }
+
+  shuffleBtn.addEventListener('click', shuffle);
+  closeBtn.addEventListener('click', () => modalBg.classList.remove('show'));
+
+  shuffle();
+</script>
+</body>
+</html>
