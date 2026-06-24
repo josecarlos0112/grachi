@@ -8,7 +8,8 @@ Monorepo: cada carpeta es un producto/mini-proyecto independiente y autocontenid
 | Proyecto | Descripción | Demo local |
 |----------|-------------|------------|
 | [`cartas/`](./cartas) | Sobres digitales "Ábrelo cuando…" estilo nazar (ojo turco). | `cartas/index.html` |
-| [`audiencias-virtuales/`](./audiencias-virtuales) | Cinco mini-juegos sueltos, tema "Tribunal de la Distancia"; cada uno reparte un premio al azar (regalo real o promesa) de un pozo compartido. | `audiencias-virtuales/*.html` |
+| [`audiencias-virtuales/`](./audiencias-virtuales) | Seis mini-juegos sueltos, tema "Tribunal de la Distancia"; cada uno reparte un premio al azar (regalo real o promesa) de un pozo compartido. | `audiencias-virtuales/*.html` |
+| [`detalles/`](./detalles) | Mini-juego "Tregua Temporal" con balanza animada, canción de fondo y foto. | `detalles/tregua_temporal.html` |
 
 ## Estructura
 
@@ -18,13 +19,17 @@ grachi/
 ├── cartas/
 │   ├── index.html      ← abre directo en el navegador
 │   └── README.md
-└── audiencias-virtuales/
-    ├── ruleta_audiencias.html
-    ├── sello_confidencial.html
-    ├── examen_barra_amor.html
-    ├── reconstruye_pruebas.html
-    ├── recurso_inapelable.html
-    └── README.md
+├── audiencias-virtuales/
+│   ├── ruleta_audiencias.html
+│   ├── sello_confidencial.html
+│   ├── examen_barra_amor.html
+│   ├── reconstruye_pruebas.html
+│   ├── recurso_inapelable.html
+│   ├── tregua_temporal.html
+│   └── assets/
+└── detalles/
+    ├── tregua_temporal.html
+    └── assets/
 ```
 
 Cada proyecto vive en su propia carpeta y es 100 % estático: se puede abrir con doble clic o servir desde GitHub Pages / Netlify / Vercel sin configuración.
