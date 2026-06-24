@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Por si me empiezas a extrañar — Tribunal de la Distancia</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sea-deep: #030b17;
+    --sea-mid: #0a2342;
+    --sea-light: #164263;
+    --gold: #d4af37;
+    --gold-dark: #aa8922;
+    --cream: #fdfbf7;
+    --accent: #ff4d6d;
+    --text-main: #ffffff;
+    --text-muted: rgba(255, 255, 255, 0.6);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    min-height: 100vh;
+    background: var(--sea-deep);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--text-main);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ==================== MAR ANIMADO ==================== */
+  .sea {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(180deg, var(--sea-deep) 0%, var(--sea-mid) 50%, var(--sea-light) 100%);
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .wave {
+    position: absolute;
+    width: 250%;
+    height: 150px;
+    left: -75%;
+    border-radius: 40% 45% 35% 40%;
+    opacity: 0.15;
+    mix-blend-mode: overlay;
+  }
+
+  .wave-1 {
+    bottom: 20%;
+    background: #ffffff;
+    animation: waveMove 10s ease-in-out infinite alternate;
+  }
+  .wave-2 {
+    bottom: 12%;
+    background: #7bb5d6;
+    animation: waveMove 14s ease-in-out infinite alternate-reverse;
+    animation-delay: -3s;
+  }
+  .wave-3 {
+    bottom: 5%;
+    background: #ffffff;
+    animation: waveMove 12s ease-in-out infinite alternate;
+    animation-delay: -5s;
+  }
+  .wave-4 {
+    bottom: -2%;
+    background: #4bb3e3;
+    animation: waveMove 16s ease-in-out infinite alternate-reverse;
+  }
+
+  @keyframes waveMove {
+    0%   { transform: translateX(-2%) rotate(-2deg); }
+    100% { transform: translateX(2%) rotate(2deg); }
+  }
+
+  .shimmer {
+    position: absolute;
+    top: -10%;
+    left: -10%;
+    width: 120%;
+    height: 60%;
+    background: radial-gradient(ellipse at 50% 0%, rgba(212, 175, 55, 0.15) 0%, transparent 70%);
+    animation: shimmerPulse 8s ease-in-out infinite alternate;
+  }
+
+  @keyframes shimmerPulse {
+    0% { opacity: 0.3; transform: scale(0.95); }
+    100% { opacity: 0.8; transform: scale(1.05); }
+  }
+
+  /* ==================== CONTENIDO PRINCIPAL ==================== */
+  .content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 420px;
+    padding: 50px 20px 80px;
+    min-height: 100vh;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .eyebrow {
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    font-size: 10px;
+    color: var(--gold);
+    margin-bottom: 12px;
+    font-weight: 700;
+  }
+
+  h1 {
+    font-family: "Playfair Display", serif;
+    font-size: 32px;
+    margin-bottom: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+
+  .subtitle {
+    font-size: 15px;
+    color: var(--text-muted);
+    font-weight: 300;
+  }
+
+  .instruction {
+    font-size: 12px;
+    color: var(--gold);
+    margin-bottom: 30px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 600;
+    opacity: 0;
+    animation: fadeInSlow 2s ease forwards 1s;
+  }
+
+  @keyframes fadeInSlow {
+    to { opacity: 1; }
+  }
+
+  /* ==================== BOTELLA ==================== */
+  .bottle-wrap {
+    position: relative;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    animation: bottleFloat 4s ease-in-out infinite;
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-bottom: 40px;
+    filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.4));
+  }
+
+  .bottle-wrap.opened {
+    opacity: 0;
+    transform: scale(0.6) translateY(100px) rotate(-15deg);
+    pointer-events: none;
+  }
+
+  @keyframes bottleFloat {
+    0%, 100% { transform: translateY(0) rotate(-4deg); }
+    50%      { transform: translateY(-16px) rotate(4deg); }
+  }
+
+  .bottle-tag {
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--text-main);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 6px 16px;
+    border-radius: 20px;
+    white-space: nowrap;
+    animation: tagPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes tagPulse {
+    0%, 100% { transform: translateX(-50%) scale(1); box-shadow: 0 0 0 0 rgba(255,255,255,0.2); }
+    50% { transform: translateX(-50%) scale(1.05); box-shadow: 0 0 15px 5px rgba(255,255,255,0.1); }
+  }
+
+  /* ==================== PAPELES ==================== */
+  .papers-area {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .paper {
+    width: 100%;
+    max-width: 340px;
+    background: var(--cream);
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5), inset 0 0 40px rgba(212,175,55,0.05);
+    overflow: hidden;
+    transform: translateY(30px) scale(0.95);
+    opacity: 0;
+    transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.6s ease;
+  }
+
+  .paper.visible {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+
+  .paper-inner {
+    padding: 32px 24px;
+    text-align: center;
+    background-image: linear-gradient(180deg, rgba(255,255,255,0.5) 0%, transparent 100%);
+  }
+
+  .paper-number {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--gold-dark);
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+
+  .paper-text {
+    font-family: Georgia, "Times New Roman", "Palatino Linotype", serif;
+    font-size: 19px;
+    font-style: italic;
+    font-weight: 400;
+    color: #2a2222;
+    line-height: 1.7;
+    letter-spacing: 0.3px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.6s ease 0.4s, transform 0.6s ease 0.4s;
+  }
+
+  .paper.visible .paper-text {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .paper-line {
+    width: 50px;
+    height: 1px;
+    background: var(--gold);
+    margin: 24px auto 0;
+    opacity: 0;
+    transition: opacity 0.6s ease 0.6s;
+  }
+
+  .paper.visible .paper-line { opacity: 1; }
+
+  .next-btn {
+    display: inline-block;
+    margin-top: 24px;
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--gold-dark);
+    font-size: 14px;
+    font-weight: 500;
+    padding: 10px 24px;
+    border-radius: 30px;
+    cursor: pointer;
+    opacity: 0;
+    transition: all 0.3s ease;
+    transition-delay: 0.8s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .paper.visible .next-btn { opacity: 1; }
+  .next-btn:active { transform: scale(0.95); background: rgba(212,175,55,0.1); }
+  .next-btn:hover { background: rgba(212,175,55,0.05); }
+
+  /* ==================== PAPEL CON FOTO ==================== */
+  .paper-photo-wrap {
+    position: relative;
+    display: inline-block;
+    margin: 10px auto 16px;
+    transform: rotate(-3deg);
+  }
+
+  .paper-photo {
+    width: 200px;
+    height: 200px;
+    border-radius: 8px;
+    object-fit: cover;
+    display: block;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 0.8s ease 0.4s, transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.4s;
+  }
+
+  .paper.visible .paper-photo {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .paper-photo-caption {
+    font-family: "Playfair Display", serif;
+    font-size: 15px;
+    font-style: italic;
+    color: var(--gold-dark);
+    margin-top: 16px;
+    opacity: 0;
+    transition: opacity 0.6s ease 0.8s;
+  }
+
+  .paper.visible .paper-photo-caption { opacity: 1; }
+
+  /* ==================== MODAL ==================== */
+  .modal-bg {
+    position: fixed;
+    inset: 0;
+    background: rgba(3, 11, 23, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+    z-index: 50;
+    padding: 24px;
+  }
+  .modal-bg.show { opacity: 1; pointer-events: all; }
+
+  .modal {
+    background: linear-gradient(145deg, rgba(253,251,247,0.98), rgba(245,240,225,0.95));
+    border-radius: 24px;
+    padding: 40px 24px 30px;
+    max-width: 350px;
+    width: 100%;
+    text-align: center;
+    transform: translateY(40px) scale(0.95);
+    transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+    color: #1a0b2e;
+    border: 1px solid rgba(255,255,255,0.4);
+  }
+  .modal-bg.show .modal { transform: translateY(0) scale(1); }
+
+  .stamp {
+    display: inline-block;
+    border: 2px solid var(--accent);
+    color: var(--accent);
+    font-weight: 800;
+    letter-spacing: 2px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    transform: rotate(-8deg) scale(1.5);
+    margin-bottom: 24px;
+    font-size: 13px;
+    text-transform: uppercase;
+    opacity: 0;
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.4s;
+  }
+  .modal-bg.show .stamp { transform: rotate(-8deg) scale(1); opacity: 1; }
+
+  .badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+  }
+  .badge-real { background: rgba(212,175,55,0.15); color: var(--gold-dark); border: 1px solid var(--gold); }
+  .badge-promesa { background: rgba(255,77,109,0.1); color: var(--accent); border: 1px solid var(--accent); }
+
+  .result-verdict {
+    font-size: 15px;
+    color: #444;
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+  .result-verdict strong {
+    font-family: "Playfair Display", serif;
+    color: #1a0b2e;
+    font-size: 20px;
+    display: block;
+    margin: 8px 0;
+  }
+
+  .result-prize {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.5;
+    margin-bottom: 30px;
+    color: var(--accent);
+    padding: 16px;
+    background: rgba(255,77,109,0.05);
+    border-radius: 16px;
+  }
+
+  .modal-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+  }
+
+  .modal-buttons button {
+    border: none;
+    padding: 14px 24px;
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.2s;
+  }
+  .modal-buttons button:active { transform: scale(0.95); }
+
+  .btn-retry {
+    background: var(--gold);
+    color: #fff;
+    flex: 2;
+    box-shadow: 0 8px 20px rgba(212,175,55,0.3);
+  }
+  .btn-close {
+    background: #e5e5e5;
+    color: #555;
+    flex: 1;
+  }
+</style>
+</head>
+<body>
+
+  <div class="sea">
+    <div class="shimmer"></div>
+    <div class="wave wave-1"></div>
+    <div class="wave wave-2"></div>
+    <div class="wave wave-3"></div>
+    <div class="wave wave-4"></div>
+  </div>
+
+  <div class="content">
+    <div class="header">
+      <p class="eyebrow">Causa N.º 006 — Tribunal de la Distancia</p>
+      <h1>🌊 Por si me empiezas a extrañar</h1>
+      <p class="subtitle">Una botella encontró el camino.</p>
+    </div>
+
+    <p class="instruction">Ha llegado algo para ti.</p>
+
+    <div class="bottle-wrap" id="bottle">
+      <svg width="100" height="220" viewBox="0 0 80 180" xmlns="http://www.w3.org/2000/svg">
+        <rect id="cork" x="30" y="8" width="20" height="22" rx="3" fill="#b5834a" stroke="#8a6230" stroke-width="1.5">
+          <animate attributeName="y" begin="indefinite" dur="0.5s" from="8" to="-40" fill="freeze" id="corkAnim"/>
+          <animate attributeName="opacity" begin="indefinite" dur="0.4s" from="1" to="0" fill="freeze" id="corkFade"/>
+        </rect>
+        <line x1="33" y1="14" x2="47" y2="14" stroke="#8a6230" stroke-width="0.8" opacity="0.5"/>
+        <line x1="33" y1="19" x2="47" y2="19" stroke="#8a6230" stroke-width="0.8" opacity="0.5"/>
+        <line x1="33" y1="24" x2="47" y2="24" stroke="#8a6230" stroke-width="0.8" opacity="0.5"/>
+        <path d="M32 30 L32 55 Q32 60 28 65 L28 65" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="1"/>
+        <path d="M48 30 L48 55 Q48 60 52 65 L52 65" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="1"/>
+        <rect x="30" y="28" width="20" height="30" rx="2" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/>
+        <path d="M30 58 Q30 62 22 70 Q14 80 14 95 L14 150 Q14 165 25 168 L55 168 Q66 165 66 150 L66 95 Q66 80 58 70 Q50 62 50 58 Z"
+              fill="rgba(140,200,230,0.25)" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"/>
+        <path d="M22 80 Q20 100 22 140" stroke="rgba(255,255,255,0.4)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <path d="M28 75 Q26 95 28 120" stroke="rgba(255,255,255,0.15)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <rect x="32" y="100" width="16" height="30" rx="2" fill="rgba(253,251,247,0.85)" transform="rotate(-12 40 115)"/>
+        <line x1="34" y1="108" x2="46" y2="106" stroke="rgba(170,137,34,0.5)" stroke-width="1" transform="rotate(-12 40 115)"/>
+        <line x1="34" y1="114" x2="44" y2="112" stroke="rgba(170,137,34,0.5)" stroke-width="1" transform="rotate(-12 40 115)"/>
+        <ellipse cx="40" cy="168" rx="26" ry="5" fill="rgba(255,255,255,0.15)"/>
+      </svg>
+      <span class="bottle-tag">Abrir botella</span>
+    </div>
+
+    <div class="papers-area" id="papersArea"></div>
+  </div>
+
+  <audio id="bgMusic" src="assets/grachi.mp3" preload="auto" loop></audio>
+
+  <div class="modal-bg" id="modalBg">
+    <div class="modal">
+      <div class="stamp" id="stamp"></div>
+      <div id="badgeWrap"></div>
+      <p class="result-verdict" id="resultVerdict"></p>
+      <p class="result-prize" id="resultPrize"></p>
+      <div class="modal-buttons">
+        <button class="btn-retry" id="retryBtn">🌊 Volver al mar</button>
+        <button class="btn-close" id="closeBtn">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const PREMIOS = [
+    { tipo: "real", texto: "🌷 Un ramo de flores llegará a tu puerta", sello: "ENTREGA AUTORIZADA" },
+    { tipo: "real", texto: "🍫 Una caja de tus chocolates favoritos, en camino", sello: "ENTREGA AUTORIZADA" },
+    { tipo: "real", texto: "📦 Un paquete sorpresa — no sé cuándo, pero llega", sello: "ENTREGA AUTORIZADA" },
+    { tipo: "real", texto: "✉️ Una carta escrita a mano, sellada y enviada por correo", sello: "ENTREGA AUTORIZADA" },
+    { tipo: "real", texto: "🎁 Un regalo elegido solo para ti — pendiente de entrega", sello: "ENTREGA AUTORIZADA" },
+    { tipo: "promesa", texto: "🎬 Una noche de película sincronizada — tú eliges", sello: "PROMESA REGISTRADA" },
+    { tipo: "promesa", texto: "🏖️ Un día de playa juntos — fecha por confirmar", sello: "PROMESA REGISTRADA" },
+    { tipo: "promesa", texto: "🌳 Una tarde de parque y manta — lo antes posible", sello: "PROMESA REGISTRADA" },
+    { tipo: "promesa", texto: "✈️ Una visita prometida — este año, sin falta", sello: "PROMESA REGISTRADA" },
+    { tipo: "promesa", texto: "📞 Una llamada larga sin prisas — cuando quieras", sello: "PROMESA REGISTRADA" }
+  ];
+
+  const FRASES = [
+    "Aunque haya silencio, aquí sigo.",                          
+    "Cada kilómetro entre nosotros tiene fecha de caducidad.",   
+    "Te escribo esto porque las palabras viajan mejor que yo."   
+  ];
+
+  let audioCtx = null;
+  let oceanNode = null;
+  let currentPaper = 0;
+  let bottleOpened = false;
+
+  const bottle = document.getElementById('bottle');
+  const papersArea = document.getElementById('papersArea');
+  const modalBg = document.getElementById('modalBg');
+  const stampEl = document.getElementById('stamp');
+  const badgeWrap = document.getElementById('badgeWrap');
+  const resultVerdict = document.getElementById('resultVerdict');
+  const resultPrize = document.getElementById('resultPrize');
+  const retryBtn = document.getElementById('retryBtn');
+  const closeBtn = document.getElementById('closeBtn');
+  const bgMusic = document.getElementById('bgMusic');
+  bgMusic.volume = 0.4;
+
+  // Lógica de audio sintetizado intacta...
+  function initAudio() {
+    if (audioCtx) return;
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    startOceanSound();
+  }
+
+  function startOceanSound() {
+    if (!audioCtx || oceanNode) return;
+    var bufSize = audioCtx.sampleRate * 2;
+    var buf = audioCtx.createBuffer(1, bufSize, audioCtx.sampleRate);
+    var data = buf.getChannelData(0);
+    for (var i = 0; i < bufSize; i++) data[i] = Math.random() * 2 - 1;
+
+    oceanNode = audioCtx.createBufferSource();
+    oceanNode.buffer = buf;
+    oceanNode.loop = true;
+
+    var lp = audioCtx.createBiquadFilter();
+    lp.type = 'lowpass';
+    lp.frequency.value = 200;
+
+    var lfo = audioCtx.createOscillator();
+    var lfoGain = audioCtx.createGain();
+    lfo.frequency.value = 0.15;
+    lfoGain.gain.value = 60;
+    lfo.connect(lfoGain);
+    lfoGain.connect(lp.frequency);
+    lfo.start();
+
+    var vol = audioCtx.createGain();
+    vol.gain.value = 0.06;
+
+    oceanNode.connect(lp);
+    lp.connect(vol);
+    vol.connect(audioCtx.destination);
+    oceanNode.start();
+  }
+
+  function playPaperSound() {
+    if (!audioCtx) return;
+    var now = audioCtx.currentTime;
+    var bufSize = audioCtx.sampleRate * 0.15;
+    var buf = audioCtx.createBuffer(1, bufSize, audioCtx.sampleRate);
+    var d = buf.getChannelData(0);
+    for (var i = 0; i < bufSize; i++) d[i] = Math.random() * 2 - 1;
+
+    var src = audioCtx.createBufferSource();
+    src.buffer = buf;
+
+    var bp = audioCtx.createBiquadFilter();
+    bp.type = 'bandpass';
+    bp.frequency.value = 3000;
+    bp.Q.value = 0.8;
+
+    var g = audioCtx.createGain();
+    g.gain.setValueAtTime(0.12, now);
+    g.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+
+    src.connect(bp);
+    bp.connect(g);
+    g.connect(audioCtx.destination);
+    src.start(now);
+    src.stop(now + 0.15);
+  }
+
+  function playFinalMelody() {
+    if (!audioCtx) return;
+    var now = audioCtx.currentTime;
+    var notes = [392, 440, 523.25, 659.25, 783.99];
+    notes.forEach(function(freq, i) {
+      var osc = audioCtx.createOscillator();
+      var gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0, now + i * 0.22);
+      gain.gain.linearRampToValueAtTime(0.14, now + i * 0.22 + 0.06);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.22 + 0.8);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now + i * 0.22);
+      osc.stop(now + i * 0.22 + 0.85);
+    });
+  }
+
+  function playCorkSound() {
+    if (!audioCtx) return;
+    var now = audioCtx.currentTime;
+    var osc = audioCtx.createOscillator();
+    var g = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(600, now);
+    osc.frequency.exponentialRampToValueAtTime(150, now + 0.12);
+    g.gain.setValueAtTime(0.2, now);
+    g.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+    osc.connect(g);
+    g.connect(audioCtx.destination);
+    osc.start(now);
+    osc.stop(now + 0.18);
+  }
+
+  function openBottle() {
+    if (bottleOpened) return;
+    bottleOpened = true;
+    initAudio();
+    playCorkSound();
+
+    var cork = document.getElementById('cork');
+    var corkAnim = document.getElementById('corkAnim');
+    var corkFade = document.getElementById('corkFade');
+    if (corkAnim && corkAnim.beginElement) {
+      corkAnim.beginElement();
+      corkFade.beginElement();
+    } else {
+      cork.style.transition = 'transform 0.4s, opacity 0.3s';
+      cork.style.transform = 'translateY(-38px)';
+      cork.style.opacity = '0';
+    }
+
+    setTimeout(function() {
+      bottle.classList.add('opened');
+    }, 600);
+
+    setTimeout(function() {
+      showPaper(0);
+    }, 1100);
+  }
+
+  function buildTextPaper(index) {
+    var div = document.createElement('div');
+    div.className = 'paper';
+    div.id = 'paper-' + index;
+
+    var labels = ['Primer mensaje', 'Segundo mensaje', 'Tercer mensaje', 'Cuarto mensaje', 'Quinto mensaje'];
+
+    div.innerHTML =
+      '<div class="paper-inner">' +
+        '<p class="paper-number">' + (labels[index] || ('Mensaje ' + (index + 1))) + '</p>' +
+        '<p class="paper-text">"' + FRASES[index] + '"</p>' +
+        '<div class="paper-line"></div>' +
+        '<button class="next-btn" id="nextBtn-' + index + '">' +
+          'Siguiente papel' +
+        '</button>' +
+      '</div>';
+
+    return div;
+  }
+
+  function buildPhotoPaper() {
+    var div = document.createElement('div');
+    div.className = 'paper';
+    div.id = 'paper-photo';
+
+    div.innerHTML =
+      '<div class="paper-inner">' +
+        '<p class="paper-number">Último mensaje</p>' +
+        '<div class="paper-photo-wrap">' +
+          '<img class="paper-photo" src="assets/foto1.jpeg" alt="Nosotros">' +
+        '</div>' +
+        '<p class="paper-photo-caption">Lo que la distancia no puede borrar.</p>' +
+        '<div class="paper-line"></div>' +
+        '<button class="next-btn" id="nextBtn-photo">Ver veredicto</button>' +
+      '</div>';
+
+    return div;
+  }
+
+  function showPaper(index) {
+    if (index > FRASES.length) {
+      showResult();
+      return;
+    }
+    currentPaper = index;
+
+    var isPhoto = index === FRASES.length;
+    var paper = isPhoto ? buildPhotoPaper() : buildTextPaper(index);
+    papersArea.appendChild(paper);
+
+    setTimeout(function() {
+      playPaperSound();
+      paper.classList.add('visible');
+    }, 50);
+
+    var btnId = isPhoto ? 'nextBtn-photo' : 'nextBtn-' + index;
+    var btn = document.getElementById(btnId);
+    btn.addEventListener('click', function() {
+      btn.disabled = true;
+      btn.style.opacity = '0.4';
+      if (isPhoto) {
+        setTimeout(showResult, 500);
+      } else {
+        setTimeout(function() { showPaper(index + 1); }, 300);
+      }
+    });
+  }
+
+  function showResult() {
+    var premio = PREMIOS[Math.floor(Math.random() * PREMIOS.length)];
+    playFinalMelody();
+
+    stampEl.textContent = premio.sello;
+    badgeWrap.innerHTML = premio.tipo === 'real'
+      ? '<span class="badge badge-real">📬 Regalo real</span>'
+      : '<span class="badge badge-promesa">🤝 Promesa</span>';
+    resultVerdict.innerHTML = 'El Tribunal registra este mensaje.<br><strong>Ha llegado a su destino.</strong>';
+    resultPrize.textContent = premio.texto;
+
+    modalBg.classList.add('show');
+  }
+
+  function resetGame() {
+    modalBg.classList.remove('show');
+    bottleOpened = false;
+    currentPaper = 0;
+    papersArea.innerHTML = '';
+    bottle.classList.remove('opened');
+
+    var cork = document.getElementById('cork');
+    cork.setAttribute('y', '8');
+    cork.setAttribute('opacity', '1');
+    cork.style.transform = '';
+    cork.style.opacity = '';
+  }
+
+  function startMusic() {
+    if (bgMusic.paused) bgMusic.play().catch(function(){});
+  }
+
+  document.addEventListener('click', startMusic, { once: true });
+  document.addEventListener('touchstart', startMusic, { once: true });
+
+  bottle.addEventListener('click', openBottle);
+  retryBtn.addEventListener('click', resetGame);
+  closeBtn.addEventListener('click', function() { modalBg.classList.remove('show'); });
+</script>
+
+</body>
+</html>

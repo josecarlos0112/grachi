@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Tregua Temporal — Tribunal de la Distancia</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<style>
+  :root {
+    --gold: #d4af37;
+    --gold-dark: #aa8922;
+    --accent: #ff4d6d;
+    --accent-glow: rgba(255, 77, 109, 0.5);
+    --text-main: #ffffff;
+    --text-muted: rgba(255, 255, 255, 0.7);
+    --glass-bg: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.2);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    min-height: 100vh;
+    /* Fondo animado suave */
+    background: linear-gradient(-45deg, #1a0b2e, #471a47, #7b2d4a, #2a1538);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--text-main);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+    overflow-x: hidden;
+  }
+
+  @keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .header-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 24px;
+    width: 100%;
+    max-width: 380px;
+    text-align: center;
+    margin-bottom: 30px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  }
+
+  .eyebrow {
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-size: 10px;
+    color: var(--gold);
+    margin: 0 0 12px;
+    font-weight: 700;
+  }
+
+  h1 {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 28px;
+    margin: 0 0 10px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .subtitle {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  .timer-container {
+    width: 100%;
+    max-width: 320px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 40px;
+  }
+
+  .timer-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gold);
+    font-variant-numeric: tabular-nums;
+    min-width: 45px;
+  }
+
+  .timer-bar-wrap {
+    flex-grow: 1;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .timer-bar {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--accent));
+    border-radius: 10px;
+    transition: width 1s linear, background-color 0.3s;
+    box-shadow: 0 0 10px var(--accent-glow);
+  }
+
+  /* BALANZA REDISEÑADA */
+  .balanza-scene {
+    position: relative;
+    width: 100%;
+    max-width: 340px;
+    height: 280px;
+    margin-bottom: 30px;
+  }
+
+  .balanza-base {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 140px;
+    height: 12px;
+    background: linear-gradient(180deg, var(--gold), var(--gold-dark));
+    border-radius: 6px 6px 2px 2px;
+    box-shadow: 0 8px 15px rgba(0,0,0,0.4);
+  }
+
+  .balanza-pillar {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 10px;
+    height: 140px;
+    background: linear-gradient(90deg, var(--gold-dark), var(--gold), var(--gold-dark));
+    border-radius: 5px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  }
+
+  .balanza-pivot {
+    position: absolute;
+    bottom: 142px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 24px;
+    height: 24px;
+    background: radial-gradient(circle, var(--gold) 30%, var(--gold-dark) 100%);
+    border-radius: 50%;
+    z-index: 3;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  }
+
+  .balanza-beam {
+    position: absolute;
+    bottom: 152px;
+    left: 50%;
+    transform: translateX(-50%) rotate(0deg);
+    transform-origin: center center;
+    width: 280px;
+    height: 6px;
+    background: linear-gradient(180deg, var(--gold), var(--gold-dark));
+    border-radius: 10px;
+    /* Transición con efecto de rebote suave */
+    transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 2;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  }
+
+  .platillo {
+    position: absolute;
+    width: 110px;
+    bottom: 30px;
+    transition: bottom 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 1;
+  }
+
+  .platillo-left { left: 0; }
+  .platillo-right { right: 0; }
+
+  .platillo-chain {
+    width: 2px;
+    height: 60px;
+    background: var(--gold);
+    transition: height 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+  }
+
+  .platillo-chain::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: -4px;
+    width: 10px;
+    height: 4px;
+    background: var(--gold);
+    border-radius: 2px;
+  }
+
+  .platillo-bowl {
+    width: 110px;
+    height: 20px;
+    background: linear-gradient(180deg, rgba(212,175,55,0.8), rgba(170,137,34,0.9));
+    border-radius: 0 0 55px 55px;
+    position: relative;
+    backdrop-filter: blur(4px);
+    border-top: 2px solid var(--gold);
+    box-shadow: inset 0 -4px 10px rgba(0,0,0,0.2), 0 8px 15px rgba(0,0,0,0.3);
+  }
+
+  .platillo-label {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 13px;
+    color: var(--text-main);
+    margin-top: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .platillo-items {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    width: 120px;
+    padding-bottom: 5px;
+  }
+
+  .item-bubble {
+    background: rgba(255, 255, 255, 0.95);
+    color: #1a0b2e;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 6px 10px;
+    border-radius: 12px;
+    white-space: nowrap;
+    max-width: 110px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    animation: dropIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    border: 1px solid rgba(0,0,0,0.05);
+  }
+
+  @keyframes dropIn {
+    0% { transform: translateY(-30px) scale(0.8); opacity: 0; }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
+  }
+
+  .distancia-icon {
+    font-size: 40px;
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 2px;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
+  }
+
+  /* BOTÓN INTERACTIVO */
+  #addBtn {
+    background: linear-gradient(135deg, #ff4d6d, #d81159);
+    color: white;
+    border: none;
+    padding: 16px 32px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 30px;
+    cursor: pointer;
+    box-shadow: 0 8px 24px var(--accent-glow);
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    margin-bottom: 12px;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    position: relative;
+    overflow: hidden;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(255, 77, 109, 0.4); }
+    70% { box-shadow: 0 0 0 15px rgba(255, 77, 109, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 77, 109, 0); }
+  }
+
+  #addBtn:active { 
+    transform: scale(0.95); 
+    box-shadow: 0 4px 12px var(--accent-glow); 
+  }
+  
+  #addBtn:disabled { 
+    opacity: 0.5; 
+    cursor: not-allowed; 
+    transform: none; 
+    animation: none;
+  }
+
+  .counter {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  /* MODAL MODERNO */
+  .modal-bg {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 5, 20, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+    z-index: 50;
+    padding: 20px;
+  }
+  
+  .modal-bg.show { 
+    opacity: 1; 
+    pointer-events: all; 
+  }
+
+  .modal {
+    background: linear-gradient(145deg, rgba(255,255,255,0.95), rgba(245,245,245,0.98));
+    border-radius: 24px;
+    padding: 35px 25px 25px;
+    max-width: 340px;
+    width: 100%;
+    text-align: center;
+    transform: translateY(30px) scale(0.95);
+    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+    color: #1a0b2e;
+    position: relative;
+  }
+  
+  .modal-bg.show .modal { 
+    transform: translateY(0) scale(1); 
+  }
+
+  .result-photo {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--gold);
+    box-shadow: 0 8px 24px rgba(212, 175, 55, 0.4);
+    margin-bottom: 20px;
+    position: absolute;
+    top: -60px;
+    left: 50%;
+    transform: translateX(-50%) scale(0);
+    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s;
+  }
+  
+  .modal-bg.show .result-photo {
+    transform: translateX(-50%) scale(1);
+  }
+
+  .stamp {
+    display: inline-block;
+    border: 2px solid var(--accent);
+    color: var(--accent);
+    font-family: "Playfair Display", serif;
+    font-weight: 800;
+    letter-spacing: 2px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    transform: rotate(-5deg) scale(2);
+    margin: 30px 0 20px;
+    font-size: 14px;
+    text-transform: uppercase;
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.4s;
+  }
+
+  .modal-bg.show .stamp {
+    transform: rotate(-5deg) scale(1);
+    opacity: 1;
+  }
+
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+  }
+  .badge-real { background: rgba(212,175,39,0.15); color: var(--gold-dark); border: 1px solid var(--gold); }
+  .badge-promesa { background: rgba(255,77,109,0.1); color: var(--accent); border: 1px solid var(--accent); }
+
+  .result-verdict {
+    font-size: 15px;
+    color: #4a4a4a;
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+
+  .result-verdict strong {
+    color: #1a0b2e;
+    font-size: 18px;
+    display: block;
+    margin: 5px 0;
+  }
+
+  .result-prize {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.5;
+    margin-bottom: 25px;
+    color: var(--accent);
+    padding: 15px;
+    background: rgba(255,77,109,0.05);
+    border-radius: 12px;
+  }
+
+  .modal-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+  }
+
+  .modal-buttons button {
+    border: none;
+    padding: 12px 24px;
+    border-radius: 24px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.2s;
+  }
+
+  .modal-buttons button:active { transform: scale(0.95); }
+
+  .btn-retry {
+    background: var(--gold);
+    color: #fff;
+    flex: 2;
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+  }
+
+  .btn-close {
+    background: #e0e0e0;
+    color: #555;
+    flex: 1;
+  }
+
+</style>
+</head>
+<body>
+
+  <div class="header-card">
+    <p class="eyebrow">Causa N.º 006 — Tribunal de la Distancia</p>
+    <h1>⚖️ Tregua Temporal</h1>
+    <p class="subtitle">Una pequeña tregua emocional. Ni vencedores ni perdedores — solo argumentos que pesan más que la distancia.</p>
+  </div>
+
+  <div class="timer-container">
+    <span class="timer-label" id="timerLabel">00:30</span>
+    <div class="timer-bar-wrap">
+      <div class="timer-bar" id="timerBar"></div>
+    </div>
+  </div>
+
+  <div class="balanza-scene" id="balanzaScene">
+    <div class="balanza-beam" id="beam"></div>
+    <div class="balanza-pivot"></div>
+    <div class="balanza-pillar"></div>
+    <div class="balanza-base"></div>
+
+    <div class="platillo platillo-left" id="platilloLeft">
+      <div class="platillo-chain" id="chainLeft"></div>
+      <div class="platillo-bowl">
+        <div class="distancia-icon">🌍</div>
+      </div>
+      <span class="platillo-label">La Distancia</span>
+    </div>
+
+    <div class="platillo platillo-right" id="platilloRight">
+      <div class="platillo-chain" id="chainRight"></div>
+      <div class="platillo-bowl">
+        <div class="platillo-items" id="itemsContainer"></div>
+      </div>
+      <span class="platillo-label">Nosotros</span>
+    </div>
+  </div>
+
+  <button id="addBtn">Añadir argumento ⚖️</button>
+  <span class="counter" id="counter">Toca para empezar</span>
+
+  <audio id="bgMusic" src="assets/grachi.mp3" preload="auto" loop></audio>
+
+  <div class="modal-bg" id="modalBg">
+    <div class="modal">
+      <img class="result-photo" src="assets/foto1.jpeg" alt="Nosotros" id="resultPhoto" onerror="this.style.display='none'">
+      <div class="stamp" id="stamp"></div>
+      <div id="badgeWrap"></div>
+      <p class="result-verdict" id="resultVerdict"></p>
+      <p class="result-prize" id="resultPrize"></p>
+      <div class="modal-buttons">
+        <button class="btn-retry" id="retryBtn">🔄 Otra ronda</button>
+        <button class="btn-close" id="closeBtn">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // El JavaScript se mantiene prácticamente igual en lógica, 
+  // adaptando las alturas visuales para que cuadren con el nuevo CSS.
+
+  const PREMIOS = [
+    { tipo: "real", texto: "🌷 Un ramo de flores llegará a tu puerta", sello: "ENTREGA AUTORIZADA" },
+    { tipo: "real", texto: "🍫 Una caja de tus chocolates favoritos, en camino", sello: "ENTREGA AUTORIZADA" },
+    { tipo: "real", texto: "📦 Un paquete sorpresa — no sé cuándo, pero llega", sello: "ENTREGA AUTORIZADA" },
+    { tipo: "real", texto: "✉️ Una carta escrita a mano, sellada y enviada por correo", sello: "ENTREGA AUTORIZADA" },
+    { tipo: "real", texto: "🎁 Un regalo elegido solo para ti — pendiente de entrega", sello: "ENTREGA AUTORIZADA" },
+    { tipo: "promesa", texto: "🎬 Una noche de película sincronizada — tú eliges", sello: "PROMESA REGISTRADA" },
+    { tipo: "promesa", texto: "🏖️ Un día de playa juntos — fecha por confirmar", sello: "PROMESA REGISTRADA" },
+    { tipo: "promesa", texto: "🌳 Una tarde de parque y manta — lo antes posible", sello: "PROMESA REGISTRADA" },
+    { tipo: "promesa", texto: "✈️ Una visita prometida — este año, sin falta", sello: "PROMESA REGISTRADA" },
+    { tipo: "promesa", texto: "📞 Una llamada larga sin prisas — cuando quieras", sello: "PROMESA REGISTRADA" }
+  ];
+
+  const FRASES = [
+    "Una llamada a las 2am",
+    "El chiste que solo entendemos nosotros",
+    "Los planes que tenemos pendientes",
+    "Esa canción que nos define",
+    "La foto que nunca publicamos",
+    "Los audios de 5 minutos",
+    "Cuando dijiste 'ojalá estuvieras aquí'",
+    "Las buenas noches de cada día",
+    "Ese meme que te mandé pensando en ti",
+    "La primera vez que nos vimos",
+    "Nuestro próximo abrazo",
+    "Los silencios cómodos en llamada",
+    "Cuando contamos los días",
+    "Esa promesa que hicimos",
+    "El 'te extraño' de las 3pm",
+    "La playlist que armamos juntos",
+    "Cuando nos desvelamos hablando",
+    "Los screenshots de nuestras conversaciones",
+    "Ese plan que vamos a cumplir",
+    "La manía tuya que me encanta"
+  ];
+
+  const WEIGHT_TO_WIN = 8;
+  const GAME_TIME = 30;
+
+  let frasePool = [...FRASES];
+  let addedCount = 0;
+  let gameActive = false;
+  let timeLeft = GAME_TIME;
+  let timerInterval = null;
+  let audioCtx = null;
+
+  const addBtn = document.getElementById('addBtn');
+  const itemsContainer = document.getElementById('itemsContainer');
+  const beam = document.getElementById('beam');
+  const platilloLeft = document.getElementById('platilloLeft');
+  const platilloRight = document.getElementById('platilloRight');
+  const chainLeft = document.getElementById('chainLeft');
+  const chainRight = document.getElementById('chainRight');
+  const timerBar = document.getElementById('timerBar');
+  const timerLabel = document.getElementById('timerLabel');
+  const counterEl = document.getElementById('counter');
+  const modalBg = document.getElementById('modalBg');
+  const stamp = document.getElementById('stamp');
+  const badgeWrap = document.getElementById('badgeWrap');
+  const resultVerdict = document.getElementById('resultVerdict');
+  const resultPrize = document.getElementById('resultPrize');
+  const retryBtn = document.getElementById('retryBtn');
+  const closeBtn = document.getElementById('closeBtn');
+  const bgMusic = document.getElementById('bgMusic');
+  bgMusic.volume = 0.4;
+
+  function initAudio() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+  }
+
+  // Sistemas de sonido sintetizado
+  function playWinSound() {
+    if (!audioCtx) return;
+    const now = audioCtx.currentTime;
+    const notes = [523.25, 659.25, 783.99, 1046.5];
+    notes.forEach((freq, i) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0, now + i * 0.15);
+      gain.gain.linearRampToValueAtTime(0.2, now + i * 0.15 + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.15 + 0.6);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now + i * 0.15);
+      osc.stop(now + i * 0.15 + 0.65);
+    });
+  }
+
+  function playClickSound() {
+    if (!audioCtx) return;
+    const now = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = 600 + addedCount * 30;
+    gain.gain.setValueAtTime(0.15, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start(now);
+    osc.stop(now + 0.15);
+  }
+
+  function formatTime(seconds) {
+    return `00:${seconds.toString().padStart(2, '0')}`;
+  }
+
+  function updateBalanza() {
+    const progress = Math.min(addedCount / WEIGHT_TO_WIN, 1);
+    const maxAngle = 18; // Ángulo un poco más pronunciado
+    const angle = -maxAngle + progress * maxAngle * 2;
+    beam.style.transform = `translateX(-50%) rotate(${angle}deg)`;
+
+    const baseBottom = 50; 
+    const tilt = progress * 45;
+
+    platilloLeft.style.bottom = (baseBottom + tilt) + 'px';
+    chainLeft.style.height = (60 - tilt * 0.8) + 'px';
+
+    platilloRight.style.bottom = (baseBottom - tilt) + 'px';
+    chainRight.style.height = (60 + tilt * 0.8) + 'px';
+  }
+
+  function startGame() {
+    gameActive = true;
+    addedCount = 0;
+    timeLeft = GAME_TIME;
+    frasePool = [...FRASES];
+    itemsContainer.innerHTML = '';
+    addBtn.disabled = false;
+    
+    timerBar.style.width = '100%';
+    timerBar.style.background = 'linear-gradient(90deg, var(--gold), var(--accent))';
+    timerLabel.textContent = formatTime(GAME_TIME);
+    counterEl.textContent = '¡Rápido, añade argumentos!';
+    updateBalanza();
+
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      timerLabel.textContent = formatTime(timeLeft);
+      timerBar.style.width = ((timeLeft / GAME_TIME) * 100) + '%';
+
+      if (timeLeft <= 10) {
+        timerBar.style.background = '#ff4d6d';
+      }
+
+      if (timeLeft <= 0) {
+        endGame(false);
+      }
+    }, 1000);
+  }
+
+  function addArgument() {
+    if (!gameActive) {
+      initAudio();
+      startGame();
+    }
+    if (!gameActive) return;
+    
+    initAudio();
+    if (frasePool.length === 0) frasePool = [...FRASES];
+
+    const idx = Math.floor(Math.random() * frasePool.length);
+    const frase = frasePool.splice(idx, 1)[0];
+    addedCount++;
+
+    playClickSound();
+
+    const bubble = document.createElement('div');
+    bubble.className = 'item-bubble';
+    bubble.textContent = frase;
+
+    if (itemsContainer.children.length > 4) {
+      itemsContainer.removeChild(itemsContainer.firstChild);
+    }
+    itemsContainer.appendChild(bubble);
+
+    counterEl.textContent = `${addedCount} argumento${addedCount !== 1 ? 's' : ''} a favor`;
+    updateBalanza();
+
+    if (addedCount >= WEIGHT_TO_WIN) {
+      endGame(true);
+    }
+  }
+
+  function endGame(won) {
+    gameActive = false;
+    addBtn.disabled = true;
+    clearInterval(timerInterval);
+
+    const premio = PREMIOS[Math.floor(Math.random() * PREMIOS.length)];
+
+    setTimeout(() => {
+      if (won) {
+        playWinSound();
+        stamp.textContent = premio.sello;
+        resultVerdict.innerHTML = 'El Tribunal declara:<br><strong>Nosotros ganamos hoy.</strong><br>La distancia queda en suspenso.';
+      } else {
+        stamp.textContent = 'VEREDICTO ESPECIAL';
+        resultVerdict.innerHTML = 'El tiempo venció esta ronda, pero el Tribunal anota este momento.<br><strong>Premio especial de consolación:</strong>';
+      }
+
+      badgeWrap.innerHTML = premio.tipo === 'real'
+        ? '<span class="badge badge-real">📬 Regalo real</span>'
+        : '<span class="badge badge-promesa">🤝 Promesa</span>';
+      resultPrize.textContent = premio.texto;
+
+      modalBg.classList.add('show');
+    }, 600);
+  }
+
+  function resetGame() {
+    modalBg.classList.remove('show');
+    timerBar.style.background = 'linear-gradient(90deg, var(--gold), var(--accent))';
+    addBtn.disabled = false;
+    gameActive = false;
+    addedCount = 0;
+    timeLeft = GAME_TIME;
+    frasePool = [...FRASES];
+    itemsContainer.innerHTML = '';
+    timerBar.style.width = '100%';
+    timerLabel.textContent = formatTime(GAME_TIME);
+    counterEl.textContent = 'Toca para empezar';
+    updateBalanza();
+  }
+
+  function startMusic() {
+    if (bgMusic.paused) bgMusic.play().catch(() => {});
+  }
+
+  document.addEventListener('click', startMusic, { once: true });
+  document.addEventListener('touchstart', startMusic, { once: true });
+
+  addBtn.addEventListener('click', addArgument);
+  retryBtn.addEventListener('click', resetGame);
+  closeBtn.addEventListener('click', () => modalBg.classList.remove('show'));
+
+  updateBalanza();
+</script>
+
+</body>
+</html>

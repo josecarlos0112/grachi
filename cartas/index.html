@@ -222,9 +222,9 @@
         /* Contenedor carta + fotos */
         .letter-wrapper {
             display: flex;
-            gap: 16px;
-            align-items: flex-start;
-            max-width: 820px;
+            gap: 28px;
+            align-items: stretch;
+            max-width: 860px;
             width: 100%;
             animation: letterIn 0.6s cubic-bezier(.22,1,.36,1) both;
         }
@@ -286,46 +286,58 @@
         .letter-photos {
             display: none; /* ← cambia a flex cuando tengas fotos */
             flex-direction: column;
-            gap: 14px;
-            max-width: 360px;
+            gap: 20px;
+            max-width: 380px;
             width: 100%;
             overflow-y: auto;
             max-height: 80vh;
-            padding-right: 4px;
+            padding: 24px 18px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 6px;
+            border: 1px solid rgba(212,175,55,0.15);
         }
         .letter-photos::-webkit-scrollbar { width: 4px; }
         .letter-photos::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
         .photo-item {
-            width: 100%;
-            border-radius: 6px;
-            overflow: hidden;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.35);
-            background: #1a2a3a;
+            background: var(--paper-bg);
+            padding: 10px 10px 6px;
+            border-radius: 3px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+            transform: rotate(-1deg);
+            transition: transform 0.3s ease;
         }
+        .photo-item:nth-child(even) { transform: rotate(1.2deg); }
+        .photo-item:hover { transform: rotate(0deg) scale(1.02); }
         .photo-item img {
             width: 100%;
             height: auto;
-            max-height: 320px;
+            max-height: 300px;
             object-fit: cover;
             display: block;
+            border-radius: 2px;
         }
         .photo-caption {
             font-family: 'Cormorant Garamond', serif;
             font-style: italic;
-            font-size: 0.85rem;
-            color: rgba(255,255,255,0.55);
+            font-size: 0.9rem;
+            color: #555;
             text-align: center;
-            padding: 8px 10px;
+            padding: 8px 4px 4px;
         }
 
         @media (max-width: 700px) {
             .letter-wrapper {
                 flex-direction: column;
                 align-items: center;
+                gap: 20px;
             }
             .letter-photos {
                 max-width: 400px;
+                padding: 16px 12px;
+                max-height: none;
             }
+            .photo-item { transform: rotate(0deg); }
+            .photo-item:nth-child(even) { transform: rotate(0deg); }
         }
 
         @keyframes pop { from { transform: translateY(14px) scale(.96); } to { transform: translateY(0) scale(1); } }
@@ -401,11 +413,11 @@
         // │  CONFIGURACIÓN — cambia false→true para habilitar cartas  │
         // ╰──────────────────────────────────────────────────────────╯
         const unlockedLetters = [
-            false, // 0: me extrañes
+            true, // 0: me extrañes
             true, // 1: tengas un mal día
-            false, // 2: no puedas dormir
+            true, // 2: no puedas dormir
             true, // 3: necesites una sonrisa
-            false, // 4: dudes de ti misma
+            true, // 4: dudes de ti misma
             true  // 5: quieras rendirte
         ];
 
@@ -415,7 +427,7 @@
                 label: "Ábrelo cuando",
                 title: "me extrañes",
                 images: [
-                    // { src: "fotos/extrañes-1.jpg", alt: "Nosotros", caption: "Nuestro momento" }
+                    { src: "fotos/foto1.jpeg", alt: "Nosotros", caption: "Para que no se te olvide que existo" }
                 ],
                 content: "Mi amor,\n\nSé que la distancia a veces pesa mucho y los días sin vernos se sienten eternos.\n\nPero quiero que sepas que aunque no pueda abrazarte físicamente ahora mismo, estás en cada uno de mis pensamientos. Cierra los ojos un segundo, respira profundo e imagíname ahí contigo.\n\nFalta un día menos para volver a vernos.\n\nTe amo muchísimo."
             },
